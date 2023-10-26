@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:social_hub/routes/routes.dart';
-import 'package:social_hub/theme/appTheme.dart';
+import 'package:we_go/routes/routes.dart';
+import 'package:we_go/theme/appTheme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

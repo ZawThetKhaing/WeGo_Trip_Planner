@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:social_hub/controller/login_controller.dart';
+import 'package:we_go/controller/login_controller.dart';
 
 class LoginBinding extends Bindings {
   @override

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:social_hub/controller/app_controller.dart';
-import 'package:social_hub/routes/routes.dart';
+import 'package:we_go/controller/app_controller.dart';
+import 'package:we_go/routes/routes.dart';
 
 class WrapperScreen extends StatefulWidget {
   const WrapperScreen({super.key});

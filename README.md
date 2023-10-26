@@ -1,4 +1,4 @@
-# social_hub
+# we_go
 
 A new Flutter project.
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:social_hub/controller/login_controller.dart';
-import 'package:social_hub/theme/appTheme.dart';
+import 'package:we_go/controller/login_controller.dart';
+import 'package:we_go/theme/appTheme.dart';
 
 class TextInputField extends StatelessWidget {
   final TextEditingController? controller;

@@ -9,7 +9,7 @@ abstract class AppTheme {
       borderSide: BorderSide(color: AppTheme.errorBorderColor),
     ),
     focusedBorder: OutlineInputBorder(
-      borderSide: BorderSide(color: AppTheme.focusBorder),
+      borderSide: BorderSide(color: AppTheme.focusBorderColor),
     ),
     focusColor: Colors.black,
     filled: true,
@@ -25,6 +25,20 @@ abstract class AppTheme {
     fontSize: 26,
     fontWeight: FontWeight.bold,
   );
+  static const TextStyle bottomNavTextStyle = TextStyle(
+    fontSize: 13,
+    fontWeight: FontWeight.w400,
+  );
+  static const TextStyle bottomNavUnselectedTextStyle = TextStyle(
+    fontSize: 13,
+    fontWeight: FontWeight.w400,
+  );
+
+  static const TextStyle welcomeTextStyle = TextStyle(
+    fontSize: 15,
+    fontWeight: FontWeight.w500,
+    color: textColor1,
+  );
 
   static const TextStyle largeTextStyle = TextStyle(
     fontSize: 20,
@@ -37,5 +51,7 @@ abstract class AppTheme {
   static const Color textColor1 = Color.fromRGBO(34, 58, 41, 1);
   static const Color boxColor2 = Color.fromRGBO(52, 168, 83, 0.2);
   static const Color errorBorderColor = Color.fromRGBO(234, 67, 53, 1);
-  static const Color focusBorder = Color.fromRGBO(52, 168, 83, 1);
+  static const Color focusBorderColor = Color.fromRGBO(52, 168, 83, 1);
+
+  static const Color btmNavUnselectedColor = Color.fromRGBO(200, 203, 201, 1);
 }

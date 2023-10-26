@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:social_hub/theme/appTheme.dart';
+import 'package:we_go/theme/appTheme.dart';
 
 class Button extends StatelessWidget {
   final String label;

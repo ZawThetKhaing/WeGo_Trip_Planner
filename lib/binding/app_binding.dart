@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:social_hub/controller/app_controller.dart';
+import 'package:we_go/controller/app_controller.dart';
 
 class AppBinding extends Bindings {
   @override

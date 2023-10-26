@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:social_hub/controller/login_controller.dart';
-import 'package:social_hub/theme/appTheme.dart';
-import 'package:social_hub/widgets/button.dart';
-import 'package:social_hub/widgets/text_form_field.dart';
-import 'package:social_hub/widgets/textfield_label_widget.dart';
+import 'package:we_go/controller/login_controller.dart';
+import 'package:we_go/theme/appTheme.dart';
+import 'package:we_go/widgets/button.dart';
+import 'package:we_go/widgets/text_form_field.dart';
+import 'package:we_go/widgets/textfield_label_widget.dart';
 
 class SignUpScreen extends GetView<LoginController> {
   const SignUpScreen({super.key});

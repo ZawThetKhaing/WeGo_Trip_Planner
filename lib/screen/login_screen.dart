@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:social_hub/controller/login_controller.dart';
-import 'package:social_hub/routes/routes.dart';
-import 'package:social_hub/theme/appTheme.dart';
-import 'package:social_hub/widgets/button.dart';
-import 'package:social_hub/widgets/google_sign_in_button.dart';
-import 'package:social_hub/widgets/or_divider.dart';
-import 'package:social_hub/widgets/text_form_field.dart';
-import 'package:social_hub/widgets/textfield_label_widget.dart';
+import 'package:we_go/controller/login_controller.dart';
+import 'package:we_go/routes/routes.dart';
+import 'package:we_go/theme/appTheme.dart';
+import 'package:we_go/widgets/button.dart';
+import 'package:we_go/widgets/google_sign_in_button.dart';
+import 'package:we_go/widgets/or_divider.dart';
+import 'package:we_go/widgets/text_form_field.dart';
+import 'package:we_go/widgets/textfield_label_widget.dart';
 
 class LoginScreen extends GetView<LoginController> {
   const LoginScreen({super.key});
