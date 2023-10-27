@@ -23,7 +23,7 @@ class TripPlanTextInputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      padding: const EdgeInsets.symmetric(vertical: 15.0),
       child: TextFormField(
         onEditingComplete: onEditingComplete,
         keyboardType: keyboardType,
@@ -35,7 +35,7 @@ class TripPlanTextInputField extends StatelessWidget {
             (_) => _?.isEmpty == true ? "This field is required" : null,
         decoration: InputDecoration(
           prefixIconConstraints:
-              const BoxConstraints.expand(width: 40, height: 40),
+              const BoxConstraints.expand(width: 40, height: 35),
           prefixIconColor: AppTheme.textColor1,
           prefixIcon: prefix,
           hintText: hintText,

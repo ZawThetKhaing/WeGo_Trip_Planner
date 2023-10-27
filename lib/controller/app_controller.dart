@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,6 +10,7 @@ import 'package:we_go/model/trip_plan_model.dart';
 import 'package:we_go/model/user_model.dart';
 import 'package:we_go/routes/routes.dart';
 import 'package:we_go/utils/collection.dart';
+import 'package:we_go/utils/utils.dart';
 
 enum AuthState {
   authorized,
@@ -17,8 +19,9 @@ enum AuthState {
 }
 
 class AppController extends GetxController {
-  late final StreamSubscription<User?>? authStateSubScription;
-  late final StreamSubscription<User?>? userStateSubScription;
+  late StreamSubscription<User?>? authStateSubScription;
+  late StreamSubscription<User?>? userStateSubScription;
+  late StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? userChanges;
 
   final Rx<AuthState> _authState = AuthState.none.obs;
   AuthState get authState => _authState.value;
@@ -48,30 +51,16 @@ class AppController extends GetxController {
   final TextEditingController budgetController = TextEditingController();
   final FocusNode budgetFocusNode = FocusNode();
 
-  final GlobalKey<FormState> tripPlanKey = GlobalKey<FormState>();
-
-  @override
-  void onInit() {
-    super.onInit();
-    authStateSubScription = authService.authStateChange().listen((event) {
-      if (event != null) {
-        _authState.value = AuthState.authorized;
-        _loginUser.value = UserModel.withUser(event);
-      } else {
-        _authState.value = AuthState.unauthorized;
-      }
-    });
-    userStateSubScription = authService.userChange().listen((event) {});
-  }
+  GlobalKey<FormState>? tripPlanKey = GlobalKey<FormState>();
 
   Future<void> logout() async {
-    Get.toNamed(AppRoutes.wrapper);
-    _loginUser.value = UserModel();
     authService.auth.signOut();
+    _loginUser.value = UserModel();
+    Get.toNamed(AppRoutes.wrapper);
   }
 
   Future<void> saveToMyTrips() async {
-    if (tripPlanKey.currentState?.validate() != true) return;
+    if (tripPlanKey?.currentState?.validate() != true) return;
     final TripPlanModel savePlan = TripPlanModel(
       tripName: tripNameController.text,
       destination: destinationsController.text,
@@ -85,6 +74,57 @@ class AppController extends GetxController {
         data: savePlan.toJson(),
       ),
     );
-    print("success");
+    Utils.toast("Success");
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+    authStateSubScription = authService.authStateChange().listen(
+      (event) {
+        if (event != null) {
+          _authState.value = AuthState.authorized;
+        } else {
+          _authState.value = AuthState.unauthorized;
+          _loginUser.value = UserModel();
+        }
+      },
+    );
+    userStateSubScription = authService.userChange().listen((event) {
+      if (event != null) {
+        userChanges =
+            fireStoreService.watchOnly(Collections.user, event.uid).listen(
+          (event) {
+            if (event.exists == true) {
+              _loginUser.value = UserModel.fromJson(event.data(), event.id);
+            }
+          },
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    authStateSubScription?.cancel();
+    authStateSubScription = null;
+    userStateSubScription?.cancel();
+    userStateSubScription = null;
+    userChanges?.cancel();
+    userChanges = null;
+
+    tripPlanKey = null;
+    tripPlanKey = GlobalKey<FormState>();
+    tripNameController.dispose();
+    tripNameFocusNode.dispose();
+    destinationsController.dispose();
+    destinationsFocusNode.dispose();
+    startDateController.dispose();
+    startDateFocusNode.dispose();
+    endDateController.dispose();
+    endDateFocusNode.dispose();
+    budgetController.dispose();
+    budgetFocusNode.dispose();
+    super.dispose();
   }
 }

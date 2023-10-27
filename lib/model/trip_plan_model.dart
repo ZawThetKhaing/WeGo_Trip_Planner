@@ -1,3 +1,5 @@
+import 'package:we_go/model/user_model.dart';
+
 class TripPlanModel {
   final String? id;
   final String tripName;
@@ -5,7 +7,10 @@ class TripPlanModel {
   final String startDate;
   final String endDate;
   final int budget;
+
   final List<Locations>? locations;
+  final DateTime createdAt;
+  final List<UserModel> participants;
   TripPlanModel({
     this.id,
     required this.tripName,
@@ -14,7 +19,8 @@ class TripPlanModel {
     required this.endDate,
     required this.budget,
     this.locations,
-  });
+    this.participants = const [],
+  }) : createdAt = DateTime.now();
 
   Map<String, dynamic> toJson() => {
         'trip_name': tripName,
@@ -23,6 +29,7 @@ class TripPlanModel {
         'end_date': endDate,
         'budget': budget,
         'location': locations,
+        'created_at': createdAt,
       };
 
   factory TripPlanModel.fromJson(Map data) => TripPlanModel(

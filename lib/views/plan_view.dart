@@ -1,7 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:we_go/controller/app_controller.dart';
+import 'package:we_go/global.dart';
 import 'package:we_go/theme/appTheme.dart';
+import 'package:we_go/utils/utils.dart';
 import 'package:we_go/widgets/button.dart';
 import 'package:we_go/widgets/trip_plan_textInputField.dart';
 
@@ -22,9 +25,11 @@ class PlanView extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Welcome to WeGo,Andrea",
-                style: AppTheme.welcomeTextStyle,
+              Obx(
+                () => Text(
+                  "Welcome to WeGo, ${controller.loginUser.userName}",
+                  style: AppTheme.welcomeTextStyle,
+                ),
               ),
               const Text(
                 "Create your dream trip now",
@@ -54,19 +59,48 @@ class PlanView extends StatelessWidget {
                   size: 18,
                 ),
               ),
-              TripPlanTextInputField(
-                controller: controller.startDateController,
-                focusNode: controller.startDateFocusNode,
-                hintText: "Start date",
-                onEditingComplete: controller.endDateFocusNode.requestFocus,
-                prefix: Image.asset("lib/assets/calendar_start.png"),
-              ),
-              TripPlanTextInputField(
-                controller: controller.endDateController,
-                focusNode: controller.endDateFocusNode,
-                hintText: "End date",
-                onEditingComplete: controller.budgetFocusNode.requestFocus,
-                prefix: Image.asset("lib/assets/calendar_end.png"),
+              Row(
+                children: [
+                  Expanded(
+                    child: TripPlanTextInputField(
+                      controller: controller.startDateController,
+                      focusNode: controller.startDateFocusNode,
+                      hintText: "Start date",
+                      keyboardType: TextInputType.number,
+                      validator: (_) {
+                        return Utils.dateTimeValidator(_);
+                      },
+                      onEditingComplete:
+                          controller.endDateFocusNode.requestFocus,
+                      prefix: SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: Image.asset("lib/assets/calendar_start.png"),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    child: TripPlanTextInputField(
+                      controller: controller.endDateController,
+                      focusNode: controller.endDateFocusNode,
+                      keyboardType: TextInputType.number,
+                      hintText: "End date",
+                      validator: (_) {
+                        return Utils.dateTimeValidator(_);
+                      },
+                      onEditingComplete:
+                          controller.budgetFocusNode.requestFocus,
+                      prefix: SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: Image.asset("lib/assets/calendar_end.png"),
+                      ),
+                    ),
+                  ),
+                ],
               ),
               TripPlanTextInputField(
                 controller: controller.budgetController,
@@ -77,10 +111,14 @@ class PlanView extends StatelessWidget {
                   controller.budgetFocusNode.unfocus();
                   controller.saveToMyTrips();
                 },
-                prefix: Image.asset("lib/assets/PiggyBank.png"),
+                prefix: SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: Image.asset("lib/assets/PiggyBank.png"),
+                ),
               ),
               Button(
-                label: "Save to my trips",
+                label: "Continue planning",
                 onPressed: controller.saveToMyTrips,
               ),
             ],

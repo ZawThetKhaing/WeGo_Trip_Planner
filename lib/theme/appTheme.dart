@@ -1,26 +1,58 @@
 import 'package:flutter/material.dart';
 
 abstract class AppTheme {
-  ///InputDecorationTheme
-  static const InputDecorationTheme inputDecorationTheme = InputDecorationTheme(
-    isDense: true,
-    border: OutlineInputBorder(borderSide: BorderSide.none),
-    focusedErrorBorder: OutlineInputBorder(
-      borderSide: BorderSide(color: AppTheme.errorBorderColor),
+  ///AppTheme
+  static ThemeData appTheme = ThemeData(
+    appBarTheme: const AppBarTheme(
+        foregroundColor: Colors.black,
+        backgroundColor: Colors.white,
+        elevation: 0),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all(
+          AppTheme.buttonColor,
+        ),
+        overlayColor: MaterialStateProperty.all(
+          Colors.transparent,
+        ),
+        elevation: MaterialStateProperty.all(0),
+        textStyle: MaterialStateProperty.all(
+          const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
     ),
-    focusedBorder: OutlineInputBorder(
-      borderSide: BorderSide(color: AppTheme.focusBorderColor),
+    textButtonTheme: TextButtonThemeData(
+      style: ButtonStyle(
+        overlayColor: MaterialStateProperty.all(
+          Colors.transparent,
+        ),
+      ),
     ),
-    focusColor: Colors.black,
-    filled: true,
-    fillColor: Color.fromRGBO(243, 243, 243, 1),
+    inputDecorationTheme: const InputDecorationTheme(
+      isDense: true,
+      border: OutlineInputBorder(borderSide: BorderSide.none),
+      focusedErrorBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: AppTheme.errorBorderColor),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: AppTheme.focusBorderColor),
+      ),
+      focusColor: Colors.black,
+      filled: true,
+      fillColor: Color.fromRGBO(243, 243, 243, 1),
+    ),
   );
 
+  ///
   static const TextStyle normalTextStyle = TextStyle(
     fontSize: 15,
     fontWeight: FontWeight.w400,
     color: textColor1,
   );
+
   static const TextStyle appNameTextstyle = TextStyle(
     fontSize: 26,
     fontWeight: FontWeight.bold,

@@ -9,9 +9,10 @@ class TextInputField extends StatelessWidget {
   final bool suffixIconContain;
   final void Function()? onEditingComplete;
   final String? Function(String?)? validator;
-  final void Function()? suffixFunction;
   final String? hintText;
   final TextInputType? keyboardType;
+  final String? index;
+  final bool? obsecureText;
 
   const TextInputField({
     super.key,
@@ -21,18 +22,19 @@ class TextInputField extends StatelessWidget {
     this.validator,
     this.hintText,
     this.keyboardType,
-    this.suffixFunction,
     this.suffixIconContain = false,
+    this.index,
+    this.obsecureText,
   });
 
   @override
   Widget build(BuildContext context) {
     return GetBuilder<LoginController>(
-      id: 'obsecure_widget',
+      id: 'obsecure_widget $index',
       builder: (ctx) {
         return TextFormField(
           keyboardType: keyboardType,
-          obscureText: ctx.isObsecure,
+          obscureText: obsecureText ?? ctx.isObsecure,
           style: AppTheme.normalTextStyle,
           controller: controller,
           focusNode: focusNode,
@@ -48,7 +50,9 @@ class TextInputField extends StatelessWidget {
             suffixIcon: suffixIconContain
                 ? IconButton(
                     splashRadius: 20,
-                    onPressed: suffixFunction,
+                    onPressed: () {
+                      ctx.isObsecureText(index ?? "");
+                    },
                     icon: Icon(
                       ctx.isObsecure ? Icons.visibility_off : Icons.visibility,
                     ),

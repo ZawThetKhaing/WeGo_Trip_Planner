@@ -35,6 +35,7 @@ class SignUpScreen extends GetView<LoginController> {
                 ///Name Input Field
                 const TextFieldLabel(label: "Name"),
                 TextInputField(
+                  obsecureText: false,
                   controller: controller.userNameController,
                   hintText: "name@example",
                   validator: (_) =>
@@ -45,11 +46,12 @@ class SignUpScreen extends GetView<LoginController> {
                 ///Email Input Field
                 const TextFieldLabel(label: "Email"),
                 TextInputField(
+                  obsecureText: false,
                   controller: controller.emailController,
                   focusNode: controller.emailFocusNode,
                   hintText: "name@example.com",
                   validator: (_) => _?.isEmpty == true
-                      ? "Email is Requried"
+                      ? "Email is requried"
                       : _?.isEmail != true
                           ? "Invalid email address."
                           : null,
@@ -59,6 +61,7 @@ class SignUpScreen extends GetView<LoginController> {
                 /// Phone Input Field
                 const TextFieldLabel(label: "Phone(Optional)"),
                 TextInputField(
+                  obsecureText: false,
                   controller: controller.phoneController,
                   focusNode: controller.phoneFocusNode,
                   keyboardType: TextInputType.phone,
@@ -68,9 +71,9 @@ class SignUpScreen extends GetView<LoginController> {
                 /// Password Input Field
                 const TextFieldLabel(label: "Password"),
                 TextInputField(
+                  index: "SignUp Password",
                   controller: controller.passwordController,
                   focusNode: controller.passwordFocusNode,
-                  suffixFunction: controller.isObsecureText,
                   suffixIconContain: true,
                   validator: (_) => _?.isEmpty == true
                       ? "Password is required"
@@ -84,9 +87,9 @@ class SignUpScreen extends GetView<LoginController> {
                 ///Confirm Password Input Field
                 const TextFieldLabel(label: "Confirm password"),
                 TextInputField(
+                  index: "Confrim Password",
                   controller: controller.confirmPasswordController,
                   focusNode: controller.confirmPasswordFocusNode,
-                  suffixFunction: controller.isObsecureText,
                   suffixIconContain: true,
                   validator: (_) => _ != controller.passwordController.text
                       ? "Password does not match"

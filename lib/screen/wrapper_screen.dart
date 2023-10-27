@@ -20,15 +20,15 @@ class _WrapperScreenState extends State<WrapperScreen> {
 
   void init() async {
     await Future.delayed(
-      const Duration(seconds: 3),
+      const Duration(seconds: 1),
       () {
         if (_appController.authState == AuthState.none) {
           Get.offNamed(AppRoutes.login);
           return;
         }
-        if (_appController.loginUser.user != null) {
+        if (_appController.authState == AuthState.authorized) {
           Get.offNamedUntil(AppRoutes.home, (route) => false);
-        } else if (_appController.loginUser.user == null) {
+        } else if (_appController.authState == AuthState.unauthorized) {
           Get.offNamedUntil(AppRoutes.login, (route) => false);
         } else {
           init();

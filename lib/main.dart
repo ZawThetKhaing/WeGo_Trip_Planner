@@ -31,38 +31,8 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       getPages: AppRoutes.getPages,
       initialRoute: AppRoutes.wrapper,
-      theme: ThemeData(
-        appBarTheme: const AppBarTheme(
-          foregroundColor: Colors.black,
-          backgroundColor: Colors.white,
-          elevation: 0,
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all(
-              AppTheme.buttonColor,
-            ),
-            overlayColor: MaterialStateProperty.all(
-              Colors.transparent,
-            ),
-            elevation: MaterialStateProperty.all(0),
-            textStyle: MaterialStateProperty.all(
-              const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ),
-        textButtonTheme: TextButtonThemeData(
-          style: ButtonStyle(
-            overlayColor: MaterialStateProperty.all(
-              Colors.transparent,
-            ),
-          ),
-        ),
-        inputDecorationTheme: AppTheme.inputDecorationTheme,
-      ),
+      // showPerformanceOverlay: true,
+      theme: AppTheme.appTheme,
     );
   }
 }

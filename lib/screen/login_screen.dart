@@ -19,7 +19,6 @@ class LoginScreen extends GetView<LoginController> {
         children: [
           SizedBox(
             width: context.width,
-            height: context.height * 0.3,
             child: Image.asset(
               "lib/assets/logo_photo.png",
               fit: BoxFit.cover,
@@ -51,12 +50,13 @@ class LoginScreen extends GetView<LoginController> {
 
                   ///Email Form Field
                   TextInputField(
+                    obsecureText: false,
                     controller: controller.loginEmailController,
                     focusNode: controller.loginEmailFocusNode,
                     onEditingComplete:
                         controller.loginPasswordFocusNode.requestFocus,
                     validator: (_) => _?.isEmpty == true
-                        ? "Email is Requried"
+                        ? "Email is requried"
                         : _?.isEmail != true
                             ? "Invalid email address."
                             : null,
@@ -70,9 +70,9 @@ class LoginScreen extends GetView<LoginController> {
                     controller: controller.loginPasswordController,
                     focusNode: controller.loginPasswordFocusNode,
                     onEditingComplete: controller.loginWithEmail,
+                    index: " Login Password ",
                     validator: (_) =>
                         _?.isEmpty == true ? "Password is required" : null,
-                    suffixFunction: controller.isObsecureText,
                     suffixIconContain: true,
                   ),
 
