@@ -21,7 +21,10 @@ enum AuthState {
 class AppController extends GetxController {
   late StreamSubscription<User?>? authStateSubScription;
   late StreamSubscription<User?>? userStateSubScription;
-  late StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>? userChanges;
+  late StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>?
+      userChangesSubScription;
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
+      tripStreamSubScription;
 
   final Rx<AuthState> _authState = AuthState.none.obs;
   AuthState get authState => _authState.value;
@@ -51,22 +54,29 @@ class AppController extends GetxController {
   final TextEditingController budgetController = TextEditingController();
   final FocusNode budgetFocusNode = FocusNode();
 
+  final TextEditingController paymentDueDateController =
+      TextEditingController();
+  final FocusNode paymentDueDateFocusNode = FocusNode();
+
   GlobalKey<FormState>? tripPlanKey = GlobalKey<FormState>();
 
   Future<void> logout() async {
     authService.auth.signOut();
     _loginUser.value = UserModel();
+    dispose();
     Get.toNamed(AppRoutes.wrapper);
   }
 
   Future<void> saveToMyTrips() async {
     if (tripPlanKey?.currentState?.validate() != true) return;
     final TripPlanModel savePlan = TripPlanModel(
+      owner: loginUser.userName ?? '',
       tripName: tripNameController.text,
       destination: destinationsController.text,
       startDate: startDateController.text,
       endDate: endDateController.text,
       budget: int.parse(budgetController.text),
+      paymentDueDate: paymentDueDateController.text,
     );
     await fireStoreService.write(
       FireStoreModel(
@@ -90,28 +100,30 @@ class AppController extends GetxController {
         }
       },
     );
-    userStateSubScription = authService.userChange().listen((event) {
-      if (event != null) {
-        userChanges =
-            fireStoreService.watchOnly(Collections.user, event.uid).listen(
-          (event) {
-            if (event.exists == true) {
-              _loginUser.value = UserModel.fromJson(event.data(), event.id);
-            }
-          },
-        );
-      }
-    });
+    userStateSubScription = authService.userChange().listen(
+      (event) {
+        if (event != null) {
+          userChangesSubScription =
+              fireStoreService.watchOnly(Collections.user, event.uid).listen(
+            (event) {
+              if (event.exists == true) {
+                _loginUser.value = UserModel.fromJson(event.data(), event.id);
+              }
+            },
+          );
+        }
+      },
+    );
   }
 
   @override
   void dispose() {
-    authStateSubScription?.cancel();
-    authStateSubScription = null;
     userStateSubScription?.cancel();
     userStateSubScription = null;
-    userChanges?.cancel();
-    userChanges = null;
+    userChangesSubScription?.cancel();
+    userChangesSubScription = null;
+    tripStreamSubScription?.cancel();
+    tripStreamSubScription = null;
 
     tripPlanKey = null;
     tripPlanKey = GlobalKey<FormState>();
@@ -125,6 +137,8 @@ class AppController extends GetxController {
     endDateFocusNode.dispose();
     budgetController.dispose();
     budgetFocusNode.dispose();
+    paymentDueDateController.dispose();
+    paymentDueDateFocusNode.dispose();
     super.dispose();
   }
 }

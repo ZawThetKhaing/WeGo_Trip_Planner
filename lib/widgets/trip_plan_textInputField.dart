@@ -9,6 +9,7 @@ class TripPlanTextInputField extends StatelessWidget {
   final String? Function(String?)? validator;
   final TextInputType? keyboardType;
   final void Function()? onEditingComplete;
+  final AutovalidateMode? autovalidateMode;
   const TripPlanTextInputField({
     super.key,
     required this.controller,
@@ -18,6 +19,7 @@ class TripPlanTextInputField extends StatelessWidget {
     this.validator,
     this.keyboardType,
     this.onEditingComplete,
+    this.autovalidateMode,
   });
 
   @override
@@ -31,6 +33,7 @@ class TripPlanTextInputField extends StatelessWidget {
         controller: controller,
         focusNode: focusNode,
         style: AppTheme.normalTextStyle,
+        autovalidateMode: autovalidateMode,
         validator: validator ??
             (_) => _?.isEmpty == true ? "This field is required" : null,
         decoration: InputDecoration(

@@ -1,9 +1,13 @@
 import 'package:get/get.dart';
+import 'package:we_go/binding/allUser_binding.dart';
 import 'package:we_go/binding/app_binding.dart';
 import 'package:we_go/binding/login_binding.dart';
+import 'package:we_go/model/trip_plan_model.dart';
 import 'package:we_go/screen/home_screen.dart';
+import 'package:we_go/screen/invite_friend_screen.dart';
 import 'package:we_go/screen/login_screen.dart';
 import 'package:we_go/screen/sign_up_screen.dart';
+import 'package:we_go/screen/trip_plan_screen.dart';
 import 'package:we_go/screen/wrapper_screen.dart';
 
 abstract class AppRoutes {
@@ -11,6 +15,8 @@ abstract class AppRoutes {
   static const String login = '/login';
   static const String signUp = '/signUp';
   static const String wrapper = '/wrapper';
+  static const String tripPlanScreen = '/tripPlanScreen';
+  static const String inviteFriend = '/inviteFriend';
 
   static List<GetPage> getPages = [
     GetPage(
@@ -25,6 +31,23 @@ abstract class AppRoutes {
       page: () => const HomeScreen(),
       bindings: [
         AppBinding(),
+      ],
+    ),
+    GetPage(
+      name: tripPlanScreen,
+      page: () => TripPlanScreen(
+        model: Get.arguments as TripPlanModel,
+      ),
+      bindings: [
+        AppBinding(),
+      ],
+    ),
+    GetPage(
+      name: inviteFriend,
+      page: () => const InviteFriendScreen(),
+      bindings: [
+        AppBinding(),
+        AllUserBinding(),
       ],
     ),
     GetPage(

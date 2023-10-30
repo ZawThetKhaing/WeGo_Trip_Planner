@@ -61,10 +61,6 @@ abstract class AppTheme {
     fontSize: 13,
     fontWeight: FontWeight.w400,
   );
-  static const TextStyle bottomNavUnselectedTextStyle = TextStyle(
-    fontSize: 13,
-    fontWeight: FontWeight.w400,
-  );
 
   static const TextStyle welcomeTextStyle = TextStyle(
     fontSize: 15,
@@ -84,6 +80,7 @@ abstract class AppTheme {
   static const Color boxColor2 = Color.fromRGBO(52, 168, 83, 0.2);
   static const Color errorBorderColor = Color.fromRGBO(234, 67, 53, 1);
   static const Color focusBorderColor = Color.fromRGBO(52, 168, 83, 1);
+  static const Color tripPlanTextColor = Color.fromRGBO(34, 58, 41, 0.75);
 
   static const Color btmNavUnselectedColor = Color.fromRGBO(200, 203, 201, 1);
 }

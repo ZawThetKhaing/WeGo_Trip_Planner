@@ -35,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
           unselectedItemColor: AppTheme.btmNavUnselectedColor,
           showUnselectedLabels: true,
           selectedLabelStyle: AppTheme.bottomNavTextStyle,
-          unselectedLabelStyle: AppTheme.bottomNavUnselectedTextStyle,
+          unselectedLabelStyle: AppTheme.bottomNavTextStyle,
           onTap: controller.bottomNav,
           currentIndex: controller.homeNaveIndex,
           items: [

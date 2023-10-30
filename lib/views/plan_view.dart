@@ -60,6 +60,7 @@ class PlanView extends StatelessWidget {
                 ),
               ),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
                     child: TripPlanTextInputField(
@@ -67,6 +68,7 @@ class PlanView extends StatelessWidget {
                       focusNode: controller.startDateFocusNode,
                       hintText: "Start date",
                       keyboardType: TextInputType.number,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (_) {
                         return Utils.dateTimeValidator(_);
                       },
@@ -88,6 +90,7 @@ class PlanView extends StatelessWidget {
                       focusNode: controller.endDateFocusNode,
                       keyboardType: TextInputType.number,
                       hintText: "End date",
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (_) {
                         return Utils.dateTimeValidator(_);
                       },
@@ -107,14 +110,31 @@ class PlanView extends StatelessWidget {
                 focusNode: controller.budgetFocusNode,
                 keyboardType: TextInputType.number,
                 hintText: "Budget per person",
+                onEditingComplete:
+                    controller.paymentDueDateFocusNode.requestFocus,
+                prefix: SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: Image.asset("lib/assets/PiggyBank.png"),
+                ),
+              ),
+              TripPlanTextInputField(
+                controller: controller.paymentDueDateController,
+                focusNode: controller.paymentDueDateFocusNode,
+                keyboardType: TextInputType.number,
+                hintText: "Payment due date",
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                validator: (_) {
+                  return Utils.dateTimeValidator(_);
+                },
                 onEditingComplete: () {
-                  controller.budgetFocusNode.unfocus();
+                  controller.paymentDueDateFocusNode.unfocus();
                   controller.saveToMyTrips();
                 },
                 prefix: SizedBox(
                   width: 18,
                   height: 18,
-                  child: Image.asset("lib/assets/PiggyBank.png"),
+                  child: Image.asset("lib/assets/calendar_payment.png"),
                 ),
               ),
               Button(
