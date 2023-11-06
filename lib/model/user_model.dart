@@ -19,7 +19,11 @@ class UserModel {
         email: data["email"],
       );
 
-  factory UserModel.fromlocal(Map data) => UserModel(
+  factory UserModel.fromInvite(
+    dynamic data,
+  ) =>
+      UserModel(
+        uid: data["uid"],
         userName: data["user_name"],
         profilePhoto: data["profile_photo"],
         phoneNumber: data["phone_number"],
@@ -27,6 +31,15 @@ class UserModel {
       );
 
   Map<String, dynamic> toJson() => {
+        'uid': uid,
+        'user_name': userName,
+        'profile_photo': profilePhoto,
+        'phone_number': phoneNumber,
+        'email': email,
+      };
+
+  Map<String, dynamic> toInvite() => {
+        'uid': uid,
         'user_name': userName,
         'profile_photo': profilePhoto,
         'phone_number': phoneNumber,

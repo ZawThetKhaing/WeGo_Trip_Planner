@@ -52,6 +52,11 @@ abstract class AppTheme {
     fontWeight: FontWeight.w400,
     color: textColor1,
   );
+  static const TextStyle errorTextStyle = TextStyle(
+    fontSize: 10,
+    fontWeight: FontWeight.w300,
+    color: errorBorderColor,
+  );
 
   static const TextStyle appNameTextstyle = TextStyle(
     fontSize: 26,
@@ -81,6 +86,8 @@ abstract class AppTheme {
   static const Color errorBorderColor = Color.fromRGBO(234, 67, 53, 1);
   static const Color focusBorderColor = Color.fromRGBO(52, 168, 83, 1);
   static const Color tripPlanTextColor = Color.fromRGBO(34, 58, 41, 0.75);
-
+  static const Color planInputFillcolor = Color.fromRGBO(34, 58, 41, 0.1);
+  static const Color likeColor = Color.fromRGBO(66, 133, 244, 1);
+  static const Color unlikeColor = Color.fromRGBO(34, 58, 41, 0.5);
   static const Color btmNavUnselectedColor = Color.fromRGBO(200, 203, 201, 1);
 }

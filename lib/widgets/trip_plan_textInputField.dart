@@ -32,19 +32,28 @@ class TripPlanTextInputField extends StatelessWidget {
         cursorColor: AppTheme.boxColor2,
         controller: controller,
         focusNode: focusNode,
-        style: AppTheme.normalTextStyle,
+        style: AppTheme.bottomNavTextStyle.copyWith(
+          color: AppTheme.textColor1,
+        ),
         autovalidateMode: autovalidateMode,
         validator: validator ??
             (_) => _?.isEmpty == true ? "This field is required" : null,
         decoration: InputDecoration(
+          errorStyle: AppTheme.errorTextStyle,
           prefixIconConstraints:
               const BoxConstraints.expand(width: 40, height: 35),
           prefixIconColor: AppTheme.textColor1,
           prefixIcon: prefix,
           hintText: hintText,
+          hintStyle: AppTheme.bottomNavTextStyle.copyWith(
+            color: AppTheme.btmNavUnselectedColor,
+          ),
           filled: false,
+          enabledBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: AppTheme.btmNavUnselectedColor),
+          ),
           border: const UnderlineInputBorder(
-            borderSide: BorderSide(width: 1),
+            borderSide: BorderSide(color: AppTheme.btmNavUnselectedColor),
           ),
           focusedBorder: const UnderlineInputBorder(
             borderSide: BorderSide(

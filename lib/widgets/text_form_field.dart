@@ -39,7 +39,6 @@ class TextInputField extends StatelessWidget {
           controller: controller,
           focusNode: focusNode,
           validator: validator,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
           onEditingComplete: onEditingComplete,
           decoration: InputDecoration(
             hintText: hintText,

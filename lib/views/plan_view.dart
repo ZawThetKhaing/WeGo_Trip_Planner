@@ -1,11 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:we_go/controller/app_controller.dart';
-import 'package:we_go/global.dart';
 import 'package:we_go/theme/appTheme.dart';
-import 'package:we_go/utils/utils.dart';
 import 'package:we_go/widgets/button.dart';
+import 'package:we_go/widgets/dateTimePicker.dart';
 import 'package:we_go/widgets/trip_plan_textInputField.dart';
 
 class PlanView extends StatelessWidget {
@@ -53,7 +51,7 @@ class PlanView extends StatelessWidget {
                 controller: controller.destinationsController,
                 focusNode: controller.destinationsFocusNode,
                 hintText: "Destination",
-                onEditingComplete: controller.startDateFocusNode.requestFocus,
+                onEditingComplete: controller.destinationsFocusNode.unfocus,
                 prefix: const Icon(
                   Icons.location_on,
                   size: 18,
@@ -63,44 +61,20 @@ class PlanView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: TripPlanTextInputField(
-                      controller: controller.startDateController,
-                      focusNode: controller.startDateFocusNode,
-                      hintText: "Start date",
-                      keyboardType: TextInputType.number,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: (_) {
-                        return Utils.dateTimeValidator(_);
-                      },
-                      onEditingComplete:
-                          controller.endDateFocusNode.requestFocus,
-                      prefix: SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: Image.asset("lib/assets/calendar_start.png"),
-                      ),
+                    child: DateTimerPicker(
+                      hintText: 'Start date',
+                      assetPath: 'calendar_start',
+                      widgetId: 'start_date',
                     ),
                   ),
                   const SizedBox(
                     width: 10,
                   ),
                   Expanded(
-                    child: TripPlanTextInputField(
-                      controller: controller.endDateController,
-                      focusNode: controller.endDateFocusNode,
-                      keyboardType: TextInputType.number,
-                      hintText: "End date",
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: (_) {
-                        return Utils.dateTimeValidator(_);
-                      },
-                      onEditingComplete:
-                          controller.budgetFocusNode.requestFocus,
-                      prefix: SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: Image.asset("lib/assets/calendar_end.png"),
-                      ),
+                    child: DateTimerPicker(
+                      hintText: 'End date',
+                      assetPath: 'calendar_end',
+                      widgetId: 'end_date',
                     ),
                   ),
                 ],
@@ -110,33 +84,17 @@ class PlanView extends StatelessWidget {
                 focusNode: controller.budgetFocusNode,
                 keyboardType: TextInputType.number,
                 hintText: "Budget per person",
-                onEditingComplete:
-                    controller.paymentDueDateFocusNode.requestFocus,
+                onEditingComplete: controller.budgetFocusNode.unfocus,
                 prefix: SizedBox(
                   width: 18,
                   height: 18,
                   child: Image.asset("lib/assets/PiggyBank.png"),
                 ),
               ),
-              TripPlanTextInputField(
-                controller: controller.paymentDueDateController,
-                focusNode: controller.paymentDueDateFocusNode,
-                keyboardType: TextInputType.number,
-                hintText: "Payment due date",
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: (_) {
-                  return Utils.dateTimeValidator(_);
-                },
-                onEditingComplete: () {
-                  controller.paymentDueDateFocusNode.unfocus();
-                  controller.saveToMyTrips();
-                },
-                prefix: SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: Image.asset("lib/assets/calendar_payment.png"),
-                ),
-              ),
+              const DateTimerPicker(
+                  hintText: 'Payment due date',
+                  assetPath: 'calendar_payment',
+                  widgetId: 'payment_due_date'),
               Button(
                 label: "Continue planning",
                 onPressed: controller.saveToMyTrips,

@@ -6,7 +6,6 @@ import 'package:we_go/controller/app_controller.dart';
 import 'package:we_go/global.dart';
 import 'package:we_go/model/trip_plan_model.dart';
 import 'package:we_go/routes/routes.dart';
-import 'package:we_go/theme/appTheme.dart';
 import 'package:we_go/utils/collection.dart';
 
 class MyTripView extends StatefulWidget {
@@ -17,23 +16,35 @@ class MyTripView extends StatefulWidget {
 }
 
 class _MyTripViewState extends State<MyTripView> {
-  final AppController controller = Get.find<AppController>();
-  final StreamController<List<TripPlanModel>> tripStream =
+  final AppController appController = Get.find<AppController>();
+  List<TripPlanModel> _myTripPlanList = [];
+  final StreamController<List<TripPlanModel>> _streamController =
       StreamController.broadcast();
-
   @override
   void initState() {
-    controller.tripStreamSubScription = fireStoreService
+    fireStoreService
         .watchAll(
       Collections.tripPlan,
     )
         .listen(
       (event) {
-        List<TripPlanModel> model = event.docs
-            .map((e) => TripPlanModel.fromJson(e.data(), e.id))
+        _myTripPlanList = event.docs
+            .map(
+              (e) => TripPlanModel.fromJson(
+                e.data(),
+                e.id,
+              ),
+            )
             .toList();
 
-        tripStream.sink.add(model);
+        _myTripPlanList = _myTripPlanList.where(
+          (element) {
+            if (element.participants == null) return false;
+            return element.ownerId == appController.loginUser.uid ||
+                (element.participants ?? []).contains(appController.loginUser);
+          },
+        ).toList();
+        _streamController.sink.add(_myTripPlanList);
       },
     );
     super.initState();
@@ -42,43 +53,38 @@ class _MyTripViewState extends State<MyTripView> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<TripPlanModel>>(
-      stream: tripStream.stream,
-      builder: (_, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-        if (snapshot.data == null) {
-          return Center(
-            child: Text(
-              "No planned trips",
-              style: AppTheme.welcomeTextStyle.copyWith(
-                color: AppTheme.hintColor,
-              ),
-            ),
-          );
-        }
-        List<TripPlanModel> model = snapshot.data!.toList();
-
-        return ListView.builder(
-          itemCount: model.length,
-          itemBuilder: (_, i) {
-            return GestureDetector(
-              onTap: () {
-                Get.toNamed(
-                  AppRoutes.tripPlanScreen,
-                  arguments: model[i],
-                );
-              },
-              child: ListTile(
-                title: Text(model[i].tripName),
-                subtitle: Text(model[i].destination),
-              ),
+        stream: _streamController.stream,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
             );
-          },
-        );
-      },
-    );
+          }
+          if (snapshot.data == null) {
+            return const Center(
+              child: Text('No trip plans.'),
+            );
+          }
+
+          return ListView.builder(
+            itemCount: _myTripPlanList.length,
+            itemBuilder: (_, i) {
+              final TripPlanModel _selectedModel = snapshot.data![i];
+
+              return GestureDetector(
+                onTap: () {
+                  Get.toNamed(
+                    AppRoutes.tripPlanScreen,
+                    arguments: _selectedModel.id,
+                  );
+                },
+                child: ListTile(
+                  title: Text(_selectedModel.tripName),
+                  subtitle: Text(_selectedModel.destination),
+                ),
+              );
+            },
+          );
+        });
   }
 }

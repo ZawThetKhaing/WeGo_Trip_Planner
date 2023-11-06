@@ -1,8 +1,7 @@
 import 'package:get/get.dart';
-import 'package:we_go/binding/allUser_binding.dart';
+import 'package:we_go/binding/trip_plan_binding.dart';
 import 'package:we_go/binding/app_binding.dart';
 import 'package:we_go/binding/login_binding.dart';
-import 'package:we_go/model/trip_plan_model.dart';
 import 'package:we_go/screen/home_screen.dart';
 import 'package:we_go/screen/invite_friend_screen.dart';
 import 'package:we_go/screen/login_screen.dart';
@@ -31,15 +30,15 @@ abstract class AppRoutes {
       page: () => const HomeScreen(),
       bindings: [
         AppBinding(),
+        TripPlanBinding(),
       ],
     ),
     GetPage(
       name: tripPlanScreen,
-      page: () => TripPlanScreen(
-        model: Get.arguments as TripPlanModel,
-      ),
+      page: () => const TripPlanScreen(),
       bindings: [
         AppBinding(),
+        TripPlanBinding(),
       ],
     ),
     GetPage(
@@ -47,7 +46,7 @@ abstract class AppRoutes {
       page: () => const InviteFriendScreen(),
       bindings: [
         AppBinding(),
-        AllUserBinding(),
+        TripPlanBinding(),
       ],
     ),
     GetPage(

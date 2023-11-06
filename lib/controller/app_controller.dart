@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -23,8 +22,6 @@ class AppController extends GetxController {
   late StreamSubscription<User?>? userStateSubScription;
   late StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>?
       userChangesSubScription;
-  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
-      tripStreamSubScription;
 
   final Rx<AuthState> _authState = AuthState.none.obs;
   AuthState get authState => _authState.value;
@@ -45,20 +42,31 @@ class AppController extends GetxController {
   final TextEditingController destinationsController = TextEditingController();
   final FocusNode destinationsFocusNode = FocusNode();
 
-  final TextEditingController startDateController = TextEditingController();
-  final FocusNode startDateFocusNode = FocusNode();
-
-  final TextEditingController endDateController = TextEditingController();
-  final FocusNode endDateFocusNode = FocusNode();
-
   final TextEditingController budgetController = TextEditingController();
   final FocusNode budgetFocusNode = FocusNode();
 
-  final TextEditingController paymentDueDateController =
-      TextEditingController();
-  final FocusNode paymentDueDateFocusNode = FocusNode();
-
   GlobalKey<FormState>? tripPlanKey = GlobalKey<FormState>();
+
+  String? startDate;
+  String? endDate;
+  String? paymentDate;
+
+  final RxBool isError = false.obs;
+
+  final RxString dateTimepicker = ''.obs;
+  void pickDateTime(String date, String widgetId) {
+    dateTimepicker.value = date;
+    if (widgetId == 'start_date') {
+      startDate = date;
+    } else if (widgetId == 'end_date') {
+      endDate = date;
+    } else if (widgetId == 'payment_due_date') {
+      paymentDate = date;
+    }
+    update([widgetId]);
+  }
+
+  bool isUploading = false;
 
   Future<void> logout() async {
     authService.auth.signOut();
@@ -67,24 +75,88 @@ class AppController extends GetxController {
     Get.toNamed(AppRoutes.wrapper);
   }
 
+  void clear() {
+    tripNameController.clear();
+    destinationsController.clear();
+    budgetController.clear();
+    dateTimepicker.value = '';
+    update(['end_date', 'start_date', 'payment_due_date']);
+  }
+
   Future<void> saveToMyTrips() async {
     if (tripPlanKey?.currentState?.validate() != true) return;
+    if (startDate == null) {
+      isError.value = true;
+      update(['start_date']);
+      return;
+    } else {
+      isError.value = false;
+      update(['start_date']);
+    }
+    if (endDate == null) {
+      isError.value = true;
+      update(['end_date']);
+      return;
+    } else {
+      isError.value = false;
+      update(['end_date']);
+    }
+    if (paymentDate == null) {
+      isError.value = true;
+      update(['payment_due_date']);
+      return;
+    } else {
+      isError.value = false;
+      update(['payment_due_date']);
+    }
+    try {
+      DateTimeRange(
+        start: DateTime.parse(startDate!),
+        end: DateTime.parse(endDate!),
+      ).duration.inDays;
+    } catch (e) {
+      return Get.defaultDialog(
+        title: "Trip create failed !",
+        middleText: "Start date can't be later than end date.",
+      );
+    }
+
+    if (isUploading == true) return;
+
+    isUploading = true;
+
     final TripPlanModel savePlan = TripPlanModel(
       owner: loginUser.userName ?? '',
+      ownerId: loginUser.uid,
       tripName: tripNameController.text,
       destination: destinationsController.text,
-      startDate: startDateController.text,
-      endDate: endDateController.text,
+      startDate: startDate!,
+      endDate: endDate!,
       budget: int.parse(budgetController.text),
-      paymentDueDate: paymentDueDateController.text,
+      paymentDueDate: paymentDate!,
+      participants: [],
     );
-    await fireStoreService.write(
-      FireStoreModel(
-        collection: Collections.tripPlan,
-        data: savePlan.toJson(),
-      ),
-    );
+    final String doc =
+        '${loginUser.uid}${tripNameController.text}${DateTime.now().toString()}';
+    try {
+      await fireStoreService.write(
+        FireStoreModel(
+          collection: Collections.tripPlan,
+          doc: doc,
+          data: savePlan.toJson(),
+        ),
+      );
+    } catch (e) {
+      Utils.toast("Failed");
+      return;
+    }
     Utils.toast("Success");
+    Get.toNamed(
+      AppRoutes.tripPlanScreen,
+      arguments: doc,
+    );
+    clear();
+    isUploading = false;
   }
 
   @override
@@ -122,23 +194,14 @@ class AppController extends GetxController {
     userStateSubScription = null;
     userChangesSubScription?.cancel();
     userChangesSubScription = null;
-    tripStreamSubScription?.cancel();
-    tripStreamSubScription = null;
-
     tripPlanKey = null;
     tripPlanKey = GlobalKey<FormState>();
     tripNameController.dispose();
     tripNameFocusNode.dispose();
     destinationsController.dispose();
     destinationsFocusNode.dispose();
-    startDateController.dispose();
-    startDateFocusNode.dispose();
-    endDateController.dispose();
-    endDateFocusNode.dispose();
     budgetController.dispose();
     budgetFocusNode.dispose();
-    paymentDueDateController.dispose();
-    paymentDueDateFocusNode.dispose();
     super.dispose();
   }
 }

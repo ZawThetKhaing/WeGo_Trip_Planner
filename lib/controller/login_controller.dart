@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -55,10 +54,11 @@ class LoginController extends GetxController {
 
     // Once signed in, return the UserCredential
 
-    await authService.auth.signInWithCredential(credential);
+    UserCredential user =
+        await authService.auth.signInWithCredential(credential);
 
     Get.toNamed(AppRoutes.wrapper);
-    afterAuth();
+    afterAuth(user);
   }
 
   Future<void> loginWithEmail() async {
@@ -90,6 +90,7 @@ class LoginController extends GetxController {
 
       authService.auth.currentUser?.updateDisplayName(userNameController.text);
     } on FirebaseAuthException catch (e) {
+      e.message;
       Utils.toast('email or password is invalid !');
 
       return;
@@ -99,10 +100,9 @@ class LoginController extends GetxController {
     afterAuth();
   }
 
-  Future<void> afterAuth() async {
-    print("AuthState after init");
-
-    final User? currentUser = authService.auth.currentUser;
+  Future<void> afterAuth([UserCredential? userCredential]) async {
+    final User? currentUser =
+        authService.auth.currentUser ?? userCredential?.user;
     if (currentUser == null) return;
     DocumentSnapshot<Map<String, dynamic>> fireData =
         await fireStoreService.readOnly(
@@ -118,6 +118,8 @@ class LoginController extends GetxController {
         userName: currentUser.displayName ?? userNameController.text,
         phoneNumber: currentUser.phoneNumber ?? phoneController.text,
         profilePhoto: currentUser.photoURL,
+        email: currentUser.email,
+        uid: fireData.id,
       );
 
       await fireStoreService.write(

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:we_go/controller/users_controller.dart';
+import 'package:we_go/controller/trip_plan_controller.dart';
 import 'package:we_go/model/user_model.dart';
 import 'package:we_go/theme/appTheme.dart';
 
@@ -14,14 +14,14 @@ class InviteFriendScreen extends StatefulWidget {
 }
 
 class _InviteFriendScreenState extends State<InviteFriendScreen> {
-  final UserController userController = Get.find<UserController>();
+  final TripPlanController tripPlanController = Get.find<TripPlanController>();
 
   final StreamController<List<UserModel>> _streamController =
       StreamController.broadcast();
 
   void searchUser(String name) {
     _streamController.sink.add(
-      userController.allUser
+      tripPlanController.allUser
           .where(
             (element) =>
                 element.userName!.replaceAll(' ', '').toUpperCase().contains(
@@ -30,6 +30,12 @@ class _InviteFriendScreenState extends State<InviteFriendScreen> {
           )
           .toList(),
     );
+  }
+
+  @override
+  void dispose() {
+    _streamController.sink.close();
+    super.dispose();
   }
 
   @override
@@ -53,9 +59,11 @@ class _InviteFriendScreenState extends State<InviteFriendScreen> {
         ),
         actions: [
           Obx(
-            () => userController.selectedUserList.isNotEmpty == true
+            () => tripPlanController.selectedUserList.isNotEmpty == true
                 ? TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      tripPlanController.addInviteFriend(Get.arguments);
+                    },
                     child: Text(
                       "Add",
                       style: AppTheme.welcomeTextStyle.copyWith(
@@ -155,7 +163,7 @@ class _InviteFriendScreenState extends State<InviteFriendScreen> {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  GetBuilder<UserController>(
+                                  GetBuilder<TripPlanController>(
                                     id: 'radio_button $i',
                                     builder: (ctx) {
                                       return Checkbox(

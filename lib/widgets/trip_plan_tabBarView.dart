@@ -1,16 +1,25 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
+
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:we_go/controller/trip_plan_controller.dart';
+import 'package:we_go/global.dart';
 import 'package:we_go/model/trip_plan_model.dart';
 import 'package:we_go/routes/routes.dart';
 import 'package:we_go/theme/appTheme.dart';
+import 'package:we_go/widgets/add_plan_bottom_sheet.dart';
 import 'package:we_go/widgets/budget_view.dart';
+import 'package:we_go/widgets/people_listTile.dart';
+import 'package:flutter/material.dart';
+import 'package:we_go/widgets/plan_list_view.dart';
 
 class TripPlanTabBarView extends StatefulWidget {
+  // final Stream<TripPlanModel> stream;
   final TripPlanModel model;
   const TripPlanTabBarView({
-    super.key,
+    // required this.stream,
     required this.model,
+    super.key,
   });
 
   @override
@@ -20,14 +29,11 @@ class TripPlanTabBarView extends StatefulWidget {
 class _TripPlanTabBarViewState extends State<TripPlanTabBarView>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
-  int dateRange = 0;
+
   @override
   void initState() {
     _tabController = TabController(length: 3, vsync: this);
-    dateRange = DateTimeRange(
-      start: DateTime.parse(widget.model.startDate),
-      end: DateTime.parse(widget.model.endDate),
-    ).duration.inDays;
+
     super.initState();
   }
 
@@ -59,13 +65,16 @@ class _TripPlanTabBarViewState extends State<TripPlanTabBarView>
               controller: _tabController,
               children: [
                 _TripPlanView(
-                  dateRange: dateRange,
+                  model: widget.model,
+                  // stream: widget.stream,
                 ),
                 _PeopleView(
                   model: widget.model,
                 ),
                 _BudgetView(
                   model: widget.model,
+
+                  // stream: widget.stream,
                 ),
               ],
             ),
@@ -77,16 +86,21 @@ class _TripPlanTabBarViewState extends State<TripPlanTabBarView>
 }
 
 class _TripPlanView extends StatelessWidget {
-  final int dateRange;
+  final TripPlanModel model;
   const _TripPlanView({
     super.key,
-    required this.dateRange,
+    required this.model,
   });
 
   @override
   Widget build(BuildContext context) {
+    int dateRange = DateTimeRange(
+      start: DateTime.parse(model.startDate),
+      end: DateTime.parse(model.endDate),
+    ).duration.inDays;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 15.0),
+      padding: const EdgeInsets.only(bottom: 10),
       child: ListView(
         children: List.generate(
           dateRange,
@@ -102,8 +116,20 @@ class _TripPlanView extends StatelessWidget {
               const SizedBox(
                 height: 15,
               ),
+              model.plans == null || model.plans?.isEmpty == true
+                  ? const SizedBox()
+                  : PlanListView(index: index, model: model),
               GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (context) => AddPlanBottomSheet(
+                      dateRange: dateRange,
+                      model: model,
+                    ),
+                  );
+                },
                 child: Row(
                   children: [
                     const Icon(
@@ -141,13 +167,15 @@ class _PeopleView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final TripPlanController _tripPlanController =
+        Get.find<TripPlanController>();
     return ListView(
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 10.0, bottom: 10),
+              padding: const EdgeInsets.only(bottom: 10),
               child: Text(
                 "Trip members",
                 style: AppTheme.welcomeTextStyle.copyWith(
@@ -156,43 +184,35 @@ class _PeopleView extends StatelessWidget {
                 ),
               ),
             ),
-            Row(
-              children: [
-                const CircleAvatar(
-                  radius: 17,
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      model.owner,
-                      style: AppTheme.welcomeTextStyle.copyWith(
-                        fontSize: 13,
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 3,
-                    ),
-                    Text(
-                      "Trip Creator",
-                      style: AppTheme.welcomeTextStyle.copyWith(
-                        fontSize: 10,
-                        color: AppTheme.tripPlanTextColor,
-                      ),
-                    ),
-                  ],
-                )
-              ],
+            PeopleListTile(
+              name: model.owner,
+              status: "Trip Creator",
             ),
-            const SizedBox(
-              height: 15,
-            ),
+            if (model.participants?.isEmpty == true) ...[
+              const SizedBox()
+            ] else ...[
+              SizedBox(
+                height: model.participants!.length <= 4
+                    ? model.participants!.length * 42
+                    : 150,
+                child: ListView.builder(
+                  itemCount: model.participants?.length,
+                  itemBuilder: (_, i) => PeopleListTile(
+                    name: model.participants?[i].userName ?? '',
+                    status: "Add by",
+                    isCreator:
+                        model.ownerId == authService.auth.currentUser?.uid,
+                    remove: () {
+                      _tripPlanController.removeFriend(
+                          model, model.participants?[i].uid ?? '');
+                    },
+                  ),
+                ),
+              ),
+            ],
             GestureDetector(
               onTap: () {
-                Get.toNamed(AppRoutes.inviteFriend);
+                Get.toNamed(AppRoutes.inviteFriend, arguments: model);
               },
               child: Row(
                 children: [
@@ -212,7 +232,7 @@ class _PeopleView extends StatelessWidget {
                   ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ],
@@ -222,6 +242,7 @@ class _PeopleView extends StatelessWidget {
 
 class _BudgetView extends StatelessWidget {
   final TripPlanModel model;
+
   const _BudgetView({
     super.key,
     required this.model,
@@ -235,7 +256,7 @@ class _BudgetView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 10.0, bottom: 10),
+              padding: const EdgeInsets.only(bottom: 10),
               child: Text(
                 "${NumberFormat.currency(
                   locale: Localizations.localeOf(context).toString(),
@@ -266,7 +287,20 @@ class _BudgetView extends StatelessWidget {
                   return Column(
                     children: [
                       BudgetPaidList(name: model.owner),
-                      const BudgetPaidList(name: "ZTK"),
+                      if (model.participants?.isEmpty == true) ...[
+                        const SizedBox(),
+                      ] else ...[
+                        SizedBox(
+                          height: model.participants!.length <= 3
+                              ? model.participants!.length * 40
+                              : 150,
+                          child: ListView.builder(
+                            itemCount: model.participants?.length,
+                            itemBuilder: (_, i) => BudgetPaidList(
+                                name: model.participants![i].userName ?? ''),
+                          ),
+                        ),
+                      ],
                       const SizedBox(
                         height: 10,
                       ),
@@ -294,7 +328,7 @@ class _BudgetView extends StatelessWidget {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Get.toNamed(AppRoutes.inviteFriend);
+                          Get.toNamed(AppRoutes.inviteFriend, arguments: model);
                         },
                         child: Row(
                           children: [
