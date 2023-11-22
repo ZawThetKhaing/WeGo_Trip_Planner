@@ -1,26 +1,22 @@
-import 'dart:ffi';
-import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:we_go/model/user_model.dart';
 
 class TripPlanModel {
   final String? id;
-  final String owner;
-  final String? ownerId;
+  final UserModel owner;
   final String tripName;
   final String destination;
   final String startDate;
   final String endDate;
   final String paymentDueDate;
   final int budget;
-
+  final String? backGroundPhoto;
   final List<Plans>? plans;
   final DateTime createdAt;
   final List<UserModel>? participants;
+
   TripPlanModel({
     this.id,
-    this.ownerId,
     required this.owner,
     required this.tripName,
     required this.destination,
@@ -28,22 +24,25 @@ class TripPlanModel {
     required this.endDate,
     required this.budget,
     required this.paymentDueDate,
+    this.backGroundPhoto,
     this.plans,
     this.participants,
   }) : createdAt = DateTime.now();
 
   Map<String, dynamic> toJson() => {
-        'owner': owner,
-        'owner_id': ownerId,
+        'owner': owner.toJson(),
         'trip_name': tripName,
         'destination': destination,
         'start_date': startDate,
         'end_date': endDate,
         'due_date': paymentDueDate,
         'budget': budget,
-        'participants': participants,
-        'plans': plans,
+        'participants': participants?.map(
+          (e) => e.toInvite(),
+        ),
+        'plans': plans?.map((e) => e.toJson()),
         'created_at': createdAt,
+        'background_photo': backGroundPhoto,
       };
 
   factory TripPlanModel.fromJson(
@@ -52,8 +51,7 @@ class TripPlanModel {
   ) {
     return TripPlanModel(
       id: id,
-      owner: data['owner'],
-      ownerId: data['owner_id'],
+      owner: UserModel.fromInvite(data['owner']),
       tripName: data['trip_name'],
       destination: data['destination'],
       startDate: data['start_date'],
@@ -69,6 +67,7 @@ class TripPlanModel {
           .toList(),
       plans:
           (data['plans'] as List? ?? []).map((e) => Plans.fromJson(e)).toList(),
+      backGroundPhoto: data['background_photo'],
     );
   }
 
@@ -78,7 +77,6 @@ class TripPlanModel {
     return TripPlanModel(
       id: data.id,
       owner: data.owner,
-      ownerId: data.ownerId,
       tripName: data.tripName,
       destination: data.destination,
       startDate: data.startDate,
@@ -87,6 +85,7 @@ class TripPlanModel {
       budget: data.budget,
       participants: data.participants,
       plans: data.plans,
+      backGroundPhoto: data.backGroundPhoto,
     );
   }
 
@@ -103,6 +102,7 @@ class Plans {
   final String content;
   final List<String> likes;
   final List<String> unlikes;
+  final List<String>? photos;
   final DateTime? createdAt;
   Plans({
     this.id,
@@ -110,6 +110,7 @@ class Plans {
     required this.title,
     required this.content,
     required this.likes,
+    this.photos,
     required this.unlikes,
     this.createdAt,
   });
@@ -122,6 +123,11 @@ class Plans {
         likes: (data['likes'] as List).map((e) => e.toString()).toList(),
         unlikes: (data['unlikes'] as List).map((e) => e.toString()).toList(),
         createdAt: (data['created_at'] as Timestamp).toDate(),
+        photos: (data['photos'] as List?)
+            ?.map(
+              (e) => e.toString(),
+            )
+            .toList(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -132,6 +138,9 @@ class Plans {
         'likes': likes,
         'unlikes': unlikes,
         'created_at': createdAt,
+        'photos': photos?.map(
+          (e) => e,
+        ),
       };
 
   @override

@@ -126,8 +126,7 @@ class AppController extends GetxController {
     isUploading = true;
 
     final TripPlanModel savePlan = TripPlanModel(
-      owner: loginUser.userName ?? '',
-      ownerId: loginUser.uid,
+      owner: loginUser,
       tripName: tripNameController.text,
       destination: destinationsController.text,
       startDate: startDate!,

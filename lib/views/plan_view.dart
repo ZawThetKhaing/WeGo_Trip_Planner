@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:we_go/controller/app_controller.dart';
 import 'package:we_go/theme/appTheme.dart';
 import 'package:we_go/widgets/button.dart';
@@ -39,12 +40,9 @@ class PlanView extends StatelessWidget {
                 hintText: "Trip name",
                 onEditingComplete:
                     controller.destinationsFocusNode.requestFocus,
-                prefix: SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: Image.asset(
-                    "lib/assets/Tent.png",
-                  ),
+                prefix: const PhosphorIcon(
+                  PhosphorIconsFill.tent,
+                  size: 18,
                 ),
               ),
               TripPlanTextInputField(
@@ -57,24 +55,30 @@ class PlanView extends StatelessWidget {
                   size: 18,
                 ),
               ),
-              Row(
+              const Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
                     child: DateTimerPicker(
                       hintText: 'Start date',
-                      assetPath: 'calendar_start',
+                      icon: PhosphorIcon(
+                        PhosphorIconsFill.calendarCheck,
+                        size: 18,
+                      ),
                       widgetId: 'start_date',
                     ),
                   ),
-                  const SizedBox(
+                  SizedBox(
                     width: 10,
                   ),
                   Expanded(
                     child: DateTimerPicker(
                       hintText: 'End date',
-                      assetPath: 'calendar_end',
                       widgetId: 'end_date',
+                      icon: PhosphorIcon(
+                        PhosphorIconsFill.calendarX,
+                        size: 18,
+                      ),
                     ),
                   ),
                 ],
@@ -85,16 +89,19 @@ class PlanView extends StatelessWidget {
                 keyboardType: TextInputType.number,
                 hintText: "Budget per person",
                 onEditingComplete: controller.budgetFocusNode.unfocus,
-                prefix: SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: Image.asset("lib/assets/PiggyBank.png"),
+                prefix: const PhosphorIcon(
+                  PhosphorIconsFill.piggyBank,
+                  size: 18,
                 ),
               ),
               const DateTimerPicker(
-                  hintText: 'Payment due date',
-                  assetPath: 'calendar_payment',
-                  widgetId: 'payment_due_date'),
+                hintText: 'Payment due date',
+                widgetId: 'payment_due_date',
+                icon: PhosphorIcon(
+                  PhosphorIconsFill.calendar,
+                  size: 18,
+                ),
+              ),
               Button(
                 label: "Continue planning",
                 onPressed: controller.saveToMyTrips,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:we_go/controller/app_controller.dart';
 import 'package:we_go/theme/appTheme.dart';
 import 'package:we_go/views/plan_view.dart';
@@ -38,33 +39,29 @@ class _HomeScreenState extends State<HomeScreen> {
           unselectedLabelStyle: AppTheme.bottomNavTextStyle,
           onTap: controller.bottomNav,
           currentIndex: controller.homeNaveIndex,
-          items: [
+          items: const [
             BottomNavigationBarItem(
-              icon: Image.asset(
-                "lib/assets/MapTrifold.png",
-                width: 30,
-                height: 30,
-                color: controller.homeNaveIndex == 0
-                    ? AppTheme.brandColor
-                    : AppTheme.btmNavUnselectedColor,
+              icon: PhosphorIcon(
+                PhosphorIconsFill.mapTrifold,
+                size: 30,
               ),
               label: "Plan",
             ),
-            const BottomNavigationBarItem(
-              icon: Icon(
-                Icons.luggage,
+            BottomNavigationBarItem(
+              icon: PhosphorIcon(
+                PhosphorIconsFill.suitcaseRolling,
                 size: 30,
               ),
               label: "My Trips",
             ),
-            const BottomNavigationBarItem(
+            BottomNavigationBarItem(
               icon: Icon(
                 Icons.notifications,
                 size: 30,
               ),
               label: "Notification",
             ),
-            const BottomNavigationBarItem(
+            BottomNavigationBarItem(
               icon: Icon(
                 Icons.menu,
                 size: 30,

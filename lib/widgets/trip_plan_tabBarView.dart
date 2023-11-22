@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:we_go/controller/trip_plan_controller.dart';
@@ -101,10 +99,13 @@ class _TripPlanView extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
-      child: ListView(
-        children: List.generate(
-          dateRange,
-          (index) => Column(
+      child: ListView.builder(
+        itemCount: dateRange,
+        itemBuilder: (_, index) {
+          final List<Plans?> checkedPlans = (model.plans ?? []).map((e) {
+            if (e.day == index + 1) return e;
+          }).toList();
+          return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
@@ -118,9 +119,16 @@ class _TripPlanView extends StatelessWidget {
               ),
               model.plans == null || model.plans?.isEmpty == true
                   ? const SizedBox()
-                  : PlanListView(index: index, model: model),
+                  : PlanListView(
+                      indexForDayCheck: index + 1,
+                      model: model,
+                      plans: checkedPlans,
+                    ),
+
+              ///Add plan
               GestureDetector(
                 onTap: () {
+                  Get.find<TripPlanController>().days.value = index + 1;
                   showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
@@ -151,8 +159,8 @@ class _TripPlanView extends StatelessWidget {
               ),
               const Divider(),
             ],
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -185,8 +193,9 @@ class _PeopleView extends StatelessWidget {
               ),
             ),
             PeopleListTile(
-              name: model.owner,
+              name: model.owner.userName ?? '',
               status: "Trip Creator",
+              photoLink: model.owner.profilePhoto,
             ),
             if (model.participants?.isEmpty == true) ...[
               const SizedBox()
@@ -200,8 +209,9 @@ class _PeopleView extends StatelessWidget {
                   itemBuilder: (_, i) => PeopleListTile(
                     name: model.participants?[i].userName ?? '',
                     status: "Add by",
+                    photoLink: model.participants?[i].profilePhoto,
                     isCreator:
-                        model.ownerId == authService.auth.currentUser?.uid,
+                        model.owner.uid == authService.auth.currentUser?.uid,
                     remove: () {
                       _tripPlanController.removeFriend(
                           model, model.participants?[i].uid ?? '');
@@ -279,14 +289,37 @@ class _BudgetView extends StatelessWidget {
                 color: AppTheme.tripPlanTextColor,
               ),
             ),
+            const SizedBox(
+              height: 20,
+            ),
             SizedBox(
               height: 250,
               child: ListView.builder(
                 itemCount: 1,
                 itemBuilder: (_, i) {
+                  model.participants?.sort(
+                    (a, b) => a.createdAt!.compareTo(b.createdAt!),
+                  );
+                  final List<int> allBudget = [
+                    model.owner.budgetPaid ?? 0,
+                  ];
+
+                  allBudget.addAll(
+                    List.generate(
+                      model.participants?.length ?? 0,
+                      (index) => model.participants?[index].budgetPaid ?? 0,
+                    ),
+                  );
+
+                  int totalBudget = allBudget.fold(
+                      0, (previousValue, element) => previousValue + element);
+
                   return Column(
                     children: [
-                      BudgetPaidList(name: model.owner),
+                      BudgetPaidList(
+                        userModel: model.owner,
+                        tripPlanModel: model,
+                      ),
                       if (model.participants?.isEmpty == true) ...[
                         const SizedBox(),
                       ] else ...[
@@ -297,53 +330,29 @@ class _BudgetView extends StatelessWidget {
                           child: ListView.builder(
                             itemCount: model.participants?.length,
                             itemBuilder: (_, i) => BudgetPaidList(
-                                name: model.participants![i].userName ?? ''),
+                              userModel: model.participants![i],
+                              tripPlanModel: model,
+                            ),
                           ),
                         ),
                       ],
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Total",
-                            style: AppTheme.welcomeTextStyle.copyWith(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          Text(
-                            "440,000 MMK",
-                            style: AppTheme.welcomeTextStyle.copyWith(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 30,
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Get.toNamed(AppRoutes.inviteFriend, arguments: model);
-                        },
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 18.0),
                         child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Icon(
-                              Icons.add_circle,
-                              size: 13,
-                              color: AppTheme.brandColor,
-                            ),
-                            const SizedBox(
-                              width: 5,
+                            Text(
+                              "Total",
+                              style: AppTheme.welcomeTextStyle.copyWith(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                             Text(
-                              "Invite friends",
-                              style: AppTheme.bottomNavTextStyle.copyWith(
-                                color: AppTheme.tripPlanTextColor,
+                              "$totalBudget MMK",
+                              style: AppTheme.welcomeTextStyle.copyWith(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ],

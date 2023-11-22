@@ -12,11 +12,11 @@ Future<void> main() async {
   Platform.isAndroid
       ? await Firebase.initializeApp(
           options: const FirebaseOptions(
-            apiKey: "AIzaSyA2MP3AqpSpHicH35e5qAs-oRwlCxa7Beg",
-            appId: "1:548767648028:android:85099ed2d974beec9cd2d9",
-            messagingSenderId: "548767648028",
-            projectId: "trip-planner-app-54f21",
-          ),
+              apiKey: "AIzaSyA2MP3AqpSpHicH35e5qAs-oRwlCxa7Beg",
+              appId: "1:548767648028:android:85099ed2d974beec9cd2d9",
+              messagingSenderId: "548767648028",
+              projectId: "trip-planner-app-54f21",
+              storageBucket: "trip-planner-app-54f21.appspot.com"),
         )
       : await Firebase.initializeApp();
 

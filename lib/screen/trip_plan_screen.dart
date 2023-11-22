@@ -1,9 +1,11 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:we_go/global.dart';
 import 'package:we_go/model/trip_plan_model.dart';
 import 'package:we_go/theme/appTheme.dart';
@@ -67,7 +69,7 @@ class _TripPlanScreenState extends State<TripPlanScreen> {
             );
           }
           if (snapshot.data == null) return const SizedBox();
-          final TripPlanModel _model = snapshot.data!;
+          final TripPlanModel model = snapshot.data!;
           return Stack(
             children: [
               Column(
@@ -75,10 +77,18 @@ class _TripPlanScreenState extends State<TripPlanScreen> {
                   SizedBox(
                     height: 200,
                     width: context.width,
-                    child: Image.asset(
-                      'lib/assets/trip_plan_default_photo.png',
-                      fit: BoxFit.cover,
-                    ),
+                    child: model.backGroundPhoto == null
+                        ? Image.asset(
+                            'lib/assets/trip_plan_default_photo.png',
+                            fit: BoxFit.cover,
+                          )
+                        : CachedNetworkImage(
+                            imageUrl: model.backGroundPhoto!,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -90,14 +100,14 @@ class _TripPlanScreenState extends State<TripPlanScreen> {
 
                         ///Title
                         SizedBox(
-                          height: 75,
+                          height: 87,
                           width: context.width,
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                _model.tripName,
+                                model.tripName,
                                 style: AppTheme.largeTextStyle,
                               ),
                               Row(
@@ -111,31 +121,29 @@ class _TripPlanScreenState extends State<TripPlanScreen> {
                                     width: 5,
                                   ),
                                   Text(
-                                    _model.destination,
+                                    model.destination,
                                     style: AppTheme.bottomNavTextStyle.copyWith(
                                       color: AppTheme.tripPlanTextColor,
                                     ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ],
                               ),
                               Row(
                                 children: [
-                                  SizedBox(
-                                    width: 13,
-                                    height: 13,
-                                    child: Image.asset(
-                                      "lib/assets/calendar_blank.png",
-                                      fit: BoxFit.cover,
-                                    ),
+                                  const PhosphorIcon(
+                                    PhosphorIconsFill.calendarBlank,
+                                    size: 13,
+                                    color: AppTheme.tripPlanTextColor,
                                   ),
                                   const SizedBox(
                                     width: 5,
                                   ),
                                   Text(
                                     "${DateFormat.MMMd().format(
-                                      DateTime.parse(_model.startDate),
+                                      DateTime.parse(model.startDate),
                                     )} to ${DateFormat.MMMd().format(
-                                      DateTime.parse(_model.endDate),
+                                      DateTime.parse(model.endDate),
                                     )}",
                                     style: AppTheme.bottomNavTextStyle.copyWith(
                                       color: AppTheme.tripPlanTextColor,
@@ -151,14 +159,16 @@ class _TripPlanScreenState extends State<TripPlanScreen> {
                   ),
                   Expanded(
                     child: TripPlanTabBarView(
-                      model: _model,
+                      model: model,
                     ),
                   )
                 ],
               ),
               Positioned(
                 top: context.width * 0.15,
-                child: const StackAppBar(),
+                child: StackAppBar(
+                  model: model,
+                ),
               ),
             ],
           );

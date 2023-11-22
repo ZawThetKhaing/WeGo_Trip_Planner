@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:we_go/controller/trip_plan_controller.dart';
@@ -125,8 +126,39 @@ class _InviteFriendScreenState extends State<InviteFriendScreen> {
                           children: [
                             Row(
                               children: [
-                                const CircleAvatar(
-                                  radius: 17,
+                                Container(
+                                  child: foundUser[i].profilePhoto == null
+                                      ? Container(
+                                          alignment: Alignment.center,
+                                          decoration: const BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: AppTheme.brandColor,
+                                          ),
+                                          width: 34,
+                                          height: 34,
+                                          child: Text(
+                                            foundUser[i]
+                                                .userName![0]
+                                                .toUpperCase(),
+                                            style: AppTheme.normalTextStyle
+                                                .copyWith(
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        )
+                                      : ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(17),
+                                          child: CachedNetworkImage(
+                                            imageUrl:
+                                                foundUser[i].profilePhoto!,
+                                            placeholder: (context, url) =>
+                                                const CircularProgressIndicator(),
+                                            fit: BoxFit.cover,
+                                            width: 34,
+                                            height: 34,
+                                          ),
+                                        ),
                                 ),
                                 const SizedBox(
                                   width: 10,

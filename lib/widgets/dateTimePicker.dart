@@ -5,13 +5,13 @@ import 'package:we_go/theme/appTheme.dart';
 
 class DateTimerPicker extends StatelessWidget {
   final String hintText;
-  final String assetPath;
   final String widgetId;
+  final Widget icon;
   const DateTimerPicker({
     super.key,
     required this.hintText,
-    required this.assetPath,
     required this.widgetId,
+    required this.icon,
   });
 
   @override
@@ -52,7 +52,7 @@ class DateTimerPicker extends StatelessWidget {
                       SizedBox(
                         width: 18,
                         height: 18,
-                        child: Image.asset("lib/assets/$assetPath.png"),
+                        child: icon,
                       ),
                       const SizedBox(
                         width: 12,

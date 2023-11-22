@@ -1,15 +1,18 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:we_go/theme/appTheme.dart';
 
 class PeopleListTile extends StatelessWidget {
   final String name;
   final String status;
+  final String? photoLink;
   final bool isCreator;
   final void Function()? remove;
   const PeopleListTile({
     super.key,
     required this.name,
     required this.status,
+    this.photoLink,
     this.isCreator = false,
     this.remove,
   });
@@ -23,8 +26,34 @@ class PeopleListTile extends StatelessWidget {
           children: [
             Row(
               children: [
-                const CircleAvatar(
-                  radius: 17,
+                Container(
+                  child: photoLink == null
+                      ? Container(
+                          alignment: Alignment.center,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: AppTheme.brandColor,
+                          ),
+                          width: 34,
+                          height: 34,
+                          child: Text(
+                            name[0].toUpperCase(),
+                            style: AppTheme.normalTextStyle.copyWith(
+                              color: Colors.white,
+                            ),
+                          ),
+                        )
+                      : ClipRRect(
+                          borderRadius: BorderRadius.circular(17),
+                          child: CachedNetworkImage(
+                            imageUrl: photoLink!,
+                            placeholder: (context, url) =>
+                                const CircularProgressIndicator(),
+                            fit: BoxFit.cover,
+                            width: 34,
+                            height: 34,
+                          ),
+                        ),
                 ),
                 const SizedBox(
                   width: 5,
