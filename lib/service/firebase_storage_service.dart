@@ -6,11 +6,11 @@ import 'package:image_picker/image_picker.dart';
 class FireBaseStorageService {
   final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
 
-  String downLoadLink = '';
+  String _downLoadLink = '';
   Future<String> upload(
-      {required String path, required XFile file, required String url}) async {
+      {required String path, required XFile file, String? url}) async {
     final Reference ref = _firebaseStorage.ref(path);
-    if (url.isNotEmpty) {
+    if (url != null && url.isNotEmpty) {
       try {
         await drop(url);
       } catch (e) {
@@ -26,13 +26,13 @@ class FireBaseStorageService {
       )
           .whenComplete(
         () async {
-          downLoadLink = await ref.getDownloadURL();
+          _downLoadLink = await ref.getDownloadURL();
         },
       );
     } catch (e) {
       ///
     }
-    return downLoadLink;
+    return _downLoadLink;
   }
 
   Future<void> drop(String url) async {

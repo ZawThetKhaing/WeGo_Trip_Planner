@@ -115,7 +115,7 @@ class MyTripsGridCard extends StatelessWidget {
                       children: [
                         const PhosphorIcon(
                           PhosphorIconsFill.calendarBlank,
-                          color: const Color.fromRGBO(255, 255, 255, 0.75),
+                          color: Color.fromRGBO(255, 255, 255, 0.75),
                           size: 10,
                         ),
                         const SizedBox(
@@ -162,13 +162,14 @@ class MyTripsGridCard extends StatelessWidget {
                                 alignment: Alignment.center,
                                 decoration: const BoxDecoration(
                                   shape: BoxShape.circle,
+                                  color: AppTheme.brandColor,
                                 ),
                                 child: model.owner.profilePhoto == null
                                     ? Text(
                                         model.owner.userName![0].toUpperCase(),
                                         style: AppTheme.bottomNavTextStyle
                                             .copyWith(
-                                          fontSize: 15,
+                                          fontSize: 13,
                                           fontWeight: FontWeight.w600,
                                           color: AppTheme.textColor1,
                                         ),

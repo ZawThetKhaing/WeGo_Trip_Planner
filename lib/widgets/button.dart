@@ -26,6 +26,11 @@ class Button extends StatelessWidget {
                 backgroundColor: MaterialStateProperty.all(
                   color ?? AppTheme.brandColor,
                 ),
+                shape: MaterialStateProperty.all(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
               ),
               onPressed: onPressed,
               child: Text(

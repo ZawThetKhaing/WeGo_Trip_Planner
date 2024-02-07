@@ -9,6 +9,7 @@ class NotificationModel {
   final String content;
   final List<String?> receivers;
   final DateTime createdAt;
+  final bool? isread;
   NotificationModel({
     this.id,
     required this.senderId,
@@ -17,6 +18,7 @@ class NotificationModel {
     required this.message,
     required this.receivers,
     required this.createdAt,
+    this.isread = false,
   });
 
   NotificationModel.forAllParticipants({
@@ -26,6 +28,7 @@ class NotificationModel {
     required this.content,
     required this.receivers,
     required this.message,
+    this.isread = false,
   }) : createdAt = DateTime.now();
 
   Map<String, dynamic> toJson() => {
@@ -35,6 +38,7 @@ class NotificationModel {
         'sender_name': senderName,
         'content': content,
         'created_at': createdAt,
+        'isRead': isread,
       };
 
   factory NotificationModel.fromJson(dynamic data, String id) =>
@@ -44,6 +48,7 @@ class NotificationModel {
         content: data['content'],
         senderId: data['sender_id'],
         message: data['message'],
+        isread: data['isRead'],
         receivers:
             (data['receivers'] as List).map((e) => e?.toString()).toList(),
         createdAt: (data['created_at'] as Timestamp).toDate(),

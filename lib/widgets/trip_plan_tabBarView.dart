@@ -86,7 +86,6 @@ class _TripPlanTabBarViewState extends State<TripPlanTabBarView>
 class _TripPlanView extends StatelessWidget {
   final TripPlanModel model;
   const _TripPlanView({
-    super.key,
     required this.model,
   });
 
@@ -102,9 +101,8 @@ class _TripPlanView extends StatelessWidget {
       child: ListView.builder(
         itemCount: dateRange,
         itemBuilder: (_, index) {
-          final List<Plans?> checkedPlans = (model.plans ?? []).map((e) {
-            if (e.day == index + 1) return e;
-          }).toList();
+          final List<PlanDays> checkedPlans = model.plans ?? [];
+
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -117,12 +115,17 @@ class _TripPlanView extends StatelessWidget {
               const SizedBox(
                 height: 15,
               ),
-              model.plans == null || model.plans?.isEmpty == true
+              checkedPlans.indexWhere(
+                        (element) => element.day == (index + 1).toString(),
+                      ) ==
+                      -1
                   ? const SizedBox()
                   : PlanListView(
-                      indexForDayCheck: index + 1,
                       model: model,
-                      plans: checkedPlans,
+                      plans: checkedPlans[checkedPlans.indexWhere(
+                        (element) => element.day == (index + 1).toString(),
+                      )]
+                          .plans,
                     ),
 
               ///Add plan
@@ -169,7 +172,6 @@ class _TripPlanView extends StatelessWidget {
 class _PeopleView extends StatelessWidget {
   final TripPlanModel model;
   const _PeopleView({
-    super.key,
     required this.model,
   });
 
@@ -200,15 +202,12 @@ class _PeopleView extends StatelessWidget {
             if (model.participants?.isEmpty == true) ...[
               const SizedBox()
             ] else ...[
-              SizedBox(
-                height: model.participants!.length <= 4
-                    ? model.participants!.length * 42
-                    : 150,
-                child: ListView.builder(
-                  itemCount: model.participants?.length,
-                  itemBuilder: (_, i) => PeopleListTile(
+              Column(
+                children: List.generate(
+                  model.participants?.length ?? 0,
+                  (i) => PeopleListTile(
                     name: model.participants?[i].userName ?? '',
-                    status: "Add by",
+                    status: "Add by ${model.participants?[i].addBy}",
                     photoLink: model.participants?[i].profilePhoto,
                     isCreator:
                         model.owner.uid == authService.auth.currentUser?.uid,
@@ -254,12 +253,28 @@ class _BudgetView extends StatelessWidget {
   final TripPlanModel model;
 
   const _BudgetView({
-    super.key,
     required this.model,
   });
 
   @override
   Widget build(BuildContext context) {
+    model.participants?.sort(
+      (a, b) => a.createdAt!.compareTo(b.createdAt!),
+    );
+    final List<int> allBudget = [
+      model.owner.budgetPaid ?? 0,
+    ];
+
+    allBudget.addAll(
+      List.generate(
+        model.participants?.length ?? 0,
+        (index) => model.participants?[index].budgetPaid ?? 0,
+      ),
+    );
+
+    int totalBudget =
+        allBudget.fold(0, (previousValue, element) => previousValue + element);
+
     return ListView(
       children: [
         Column(
@@ -292,76 +307,51 @@ class _BudgetView extends StatelessWidget {
             const SizedBox(
               height: 20,
             ),
-            SizedBox(
-              height: 250,
-              child: ListView.builder(
-                itemCount: 1,
-                itemBuilder: (_, i) {
-                  model.participants?.sort(
-                    (a, b) => a.createdAt!.compareTo(b.createdAt!),
-                  );
-                  final List<int> allBudget = [
-                    model.owner.budgetPaid ?? 0,
-                  ];
-
-                  allBudget.addAll(
-                    List.generate(
+            Column(
+              children: [
+                BudgetPaidList(
+                  userModel: model.owner,
+                  tripPlanModel: model,
+                  isTripCreater: false,
+                ),
+                if (model.participants?.isEmpty == true) ...[
+                  const SizedBox(),
+                ] else ...[
+                  Column(
+                    children: List.generate(
                       model.participants?.length ?? 0,
-                      (index) => model.participants?[index].budgetPaid ?? 0,
-                    ),
-                  );
-
-                  int totalBudget = allBudget.fold(
-                      0, (previousValue, element) => previousValue + element);
-
-                  return Column(
-                    children: [
-                      BudgetPaidList(
-                        userModel: model.owner,
+                      (i) => BudgetPaidList(
+                        userModel: model.participants![i],
                         tripPlanModel: model,
+                        isTripCreater: model.owner.uid ==
+                            authService.auth.currentUser!.uid,
                       ),
-                      if (model.participants?.isEmpty == true) ...[
-                        const SizedBox(),
-                      ] else ...[
-                        SizedBox(
-                          height: model.participants!.length <= 3
-                              ? model.participants!.length * 40
-                              : 150,
-                          child: ListView.builder(
-                            itemCount: model.participants?.length,
-                            itemBuilder: (_, i) => BudgetPaidList(
-                              userModel: model.participants![i],
-                              tripPlanModel: model,
-                            ),
-                          ),
+                    ),
+                  ),
+                ],
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 18.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Total",
+                        style: AppTheme.welcomeTextStyle.copyWith(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
                         ),
-                      ],
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 18.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Total",
-                              style: AppTheme.welcomeTextStyle.copyWith(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            Text(
-                              "$totalBudget MMK",
-                              style: AppTheme.welcomeTextStyle.copyWith(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
+                      ),
+                      Text(
+                        "$totalBudget MMK",
+                        style: AppTheme.welcomeTextStyle.copyWith(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
-                  );
-                },
-              ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

@@ -11,6 +11,9 @@ abstract class Utils {
         gravity: ToastGravity.CENTER,
       );
 
+  static String aboutUs =
+      ", the ultimate trip planning app designed to simplify your travel experiences. WeGo was born from the struggles of two friends, in organizing a group trip. Their shared passion for travel and tech innovation led them to create a user-friendly solution to streamline the complexities of planning group travel.\n\nAt WeGo, our goal is to empower travelers globally by simplifying the trip planning process. We strive to provide an intuitive platform fostering effortless collaboration among travel groups, ensuring memorable journeys. \n\nYou may support us and start using WeGo to transform your trip planning experience. Whether it's a family vacation, friends' getaway, or solo adventure, WeGo is your trusted companion for turning travel dreams into reality. \n\nEmbark on your next adventure with WeGo today and discover a world of possibilities.\n\nHappy exploring!\nWeGo Team";
+
   static String ago(DateTime date) {
     if (DateTime.now().difference(date).inMinutes < 60) {
       return '${DateTime.now().difference(date).inMinutes}m';

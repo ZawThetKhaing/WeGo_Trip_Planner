@@ -13,33 +13,14 @@ import 'package:we_go/model/user_model.dart';
 import 'package:we_go/utils/collection.dart';
 import 'package:we_go/utils/utils.dart';
 
-class TripPlanController extends GetxController {
-  late StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
-      allUserSubScription;
-
-  final RxList<UserModel> _allUser = <UserModel>[].obs;
-  List<UserModel> get allUser => _allUser;
-
-  RxList<UserModel> selectedUserList = <UserModel>[].obs;
-
-  final TextEditingController addPlanTitleController = TextEditingController();
-  final TextEditingController addPlanContentController =
-      TextEditingController();
-  final TextEditingController addPlanAddLinkController =
-      TextEditingController();
-
-  final TextEditingController budgetEntryController = TextEditingController();
-  final FocusNode tripPlanFocusNode = FocusNode();
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-
-  bool isUploading = false;
-
-  final RxInt days = 1.obs;
+class TripPlanController extends GetxController with TripPlanMixin {
+  ///Dropdown Ui Control
   void dropDownChange(int? value) {
     days.value = value ?? 0;
     update(['drop_down_widget']);
   }
 
+  ///Select friends to invite
   void selectFriend(UserModel model, int i) {
     if (selectedUserList.contains(model)) {
       selectedUserList.remove(model);
@@ -49,148 +30,7 @@ class TripPlanController extends GetxController {
     update(['radio_button $i']);
   }
 
-  Future<void> like(
-    TripPlanModel model,
-    String uid,
-    Plans plan,
-  ) async {
-    final List<Plans> initialPlans = model.plans!.toList();
-
-    List<String> initialLikes = plan.likes.toList();
-    initialPlans.remove(plan);
-
-    if (initialLikes.contains(uid)) {
-      initialLikes.remove(uid);
-    } else {
-      initialLikes.add(uid);
-    }
-    plan = Plans(
-      id: plan.id,
-      day: plan.day,
-      title: plan.title,
-      content: plan.content,
-      likes: initialLikes,
-      unlikes: plan.unlikes,
-      createdAt: plan.createdAt,
-    );
-
-    initialPlans.add(plan);
-
-    await fireStoreService.update(
-      FireStoreModel(
-        collection: Collections.tripPlan,
-        doc: model.id,
-        data: {
-          'plans': initialPlans.map((e) => e.toJson()),
-        },
-      ),
-    );
-  }
-
-  Future<void> disLike(
-    TripPlanModel model,
-    String uid,
-    Plans plan,
-  ) async {
-    final List<Plans> initialPlans = model.plans!.toList();
-
-    List<String> initialDisLike = plan.unlikes.toList();
-    initialPlans.remove(plan);
-
-    if (initialDisLike.contains(uid)) {
-      initialDisLike.remove(uid);
-    } else {
-      initialDisLike.add(uid);
-    }
-    plan = Plans(
-      id: plan.id,
-      day: plan.day,
-      title: plan.title,
-      content: plan.content,
-      likes: plan.likes,
-      unlikes: initialDisLike,
-      createdAt: plan.createdAt,
-    );
-
-    initialPlans.add(plan);
-
-    await fireStoreService.update(
-      FireStoreModel(
-        collection: Collections.tripPlan,
-        doc: model.id,
-        data: {
-          'plans': initialPlans.map((e) => e.toJson()),
-        },
-      ),
-    );
-  }
-
-  Future<void> addPlan(TripPlanModel model) async {
-    if (formKey.currentState?.validate() != true) return;
-    if (isUploading) return;
-    isUploading = true;
-    Get.back();
-    Utils.toast("Uploading");
-    final List<Plans> initialPlans = model.plans ?? [];
-    final List<Future<String>> uploadTasks = [];
-    if (addPlansImages.isNotEmpty) {
-      for (XFile photoFile in addPlansImages) {
-        uploadTasks.add(
-          fireBaseStorageService.upload(
-            path:
-                'trip_plan/${model.id}/plan_day_$days/${photoFile.name} ${DateTime.now()}.jpg',
-            file: photoFile,
-            url: '',
-          ),
-        );
-      }
-    }
-    final List<String> downLoadLink = await Future.wait(uploadTasks);
-    final Plans currentPlan = Plans(
-      id: '${days.value}${Random.secure().nextInt(100000)}${DateTime.now()}',
-      day: days.value,
-      title: addPlanTitleController.text,
-      content: addPlanContentController.text,
-      likes: [],
-      unlikes: [],
-      photos: downLoadLink,
-      createdAt: DateTime.now(),
-    );
-
-    initialPlans.add(currentPlan);
-    await fireStoreService.update(
-      FireStoreModel(
-        collection: Collections.tripPlan,
-        doc: model.id,
-        data: {
-          'plans': initialPlans.map((e) => e.toJson()),
-        },
-      ),
-    );
-    addPlanAddLinkController.clear();
-    addPlanContentController.clear();
-    addPlanTitleController.clear();
-    Utils.toast("Successfully added");
-
-    isUploading = false;
-  }
-
-  Future<void> removeFriend(TripPlanModel model, String id) async {
-    List<UserModel> _participant = model.participants?.toList() ?? [];
-    _participant.remove(UserModel(uid: id));
-    await fireStoreService.update(
-      FireStoreModel(
-        collection: Collections.tripPlan,
-        doc: model.id,
-        data: {
-          'participants': _participant.map(
-            (e) => e.toInvite(),
-          ),
-        },
-      ),
-    );
-  }
-
+  ///Add friends (Access all participants)
   Future<void> addInviteFriend(TripPlanModel model) async {
     List<UserModel> _participant = model.participants?.toList() ?? [];
     final List<UserModel> forNoti = [];
@@ -237,8 +77,184 @@ class TripPlanController extends GetxController {
     Utils.toast("Successfully added");
   }
 
-  final Rx<XFile> pickedImage = XFile('').obs;
-  Future<void> pickImage(TripPlanModel model) async {
+  ///Remove existing friend (Access Trip Creater Only)
+  Future<void> removeFriend(TripPlanModel model, String id) async {
+    List<UserModel> _participant = model.participants?.toList() ?? [];
+    _participant.remove(UserModel(uid: id));
+    await fireStoreService.update(
+      FireStoreModel(
+        collection: Collections.tripPlan,
+        doc: model.id,
+        data: {
+          'participants': _participant.map(
+            (e) => e.toInvite(),
+          ),
+        },
+      ),
+    );
+  }
+
+  ///Like plan
+  Future<void> like(
+    TripPlanModel model,
+    String uid,
+    Plans plan,
+    String day,
+  ) async {
+    final List<PlanDays> initialPlans = model.plans!.toList();
+
+    PlanDays? planDay = initialPlans.firstWhereOrNull((e) => e.day == day);
+    planDay!.plans.remove(plan);
+    initialPlans.remove(planDay);
+    List<String> initialLikes = plan.likes.toList();
+
+    if (initialLikes.contains(uid)) {
+      initialLikes.remove(uid);
+    } else {
+      initialLikes.add(uid);
+    }
+    plan = Plans(
+      id: plan.id,
+      day: plan.day,
+      title: plan.title,
+      content: plan.content,
+      likes: initialLikes,
+      unlikes: plan.unlikes,
+      createdAt: plan.createdAt,
+      photos: plan.photos,
+      relatedLink: plan.relatedLink,
+    );
+
+    planDay.plans.add(plan);
+
+    initialPlans.add(planDay);
+
+    await fireStoreService.update(
+      FireStoreModel(
+        collection: Collections.tripPlan,
+        doc: model.id,
+        data: {
+          'plans': initialPlans.map((e) => e.toJson()),
+        },
+      ),
+    );
+  }
+
+  ///Dislike lan
+  Future<void> disLike(
+    TripPlanModel model,
+    String uid,
+    Plans plan,
+    String day,
+  ) async {
+    List<String> initialDisLike = plan.unlikes.toList();
+    final List<PlanDays> initialPlans = model.plans!.toList();
+
+    PlanDays? planDay = initialPlans.firstWhereOrNull((e) => e.day == day);
+    planDay!.plans.remove(plan);
+    initialPlans.remove(planDay);
+
+    if (initialDisLike.contains(uid)) {
+      initialDisLike.remove(uid);
+    } else {
+      initialDisLike.add(uid);
+    }
+    plan = Plans(
+      id: plan.id,
+      day: plan.day,
+      title: plan.title,
+      relatedLink: plan.relatedLink,
+      content: plan.content,
+      likes: plan.likes,
+      unlikes: initialDisLike,
+      createdAt: plan.createdAt,
+      photos: plan.photos,
+    );
+
+    planDay.plans.add(plan);
+    initialPlans.add(planDay);
+
+    await fireStoreService.update(
+      FireStoreModel(
+        collection: Collections.tripPlan,
+        doc: model.id,
+        data: {
+          'plans': initialPlans.map((e) => e.toJson()),
+        },
+      ),
+    );
+  }
+
+  ///Add plans
+  Future<void> addPlan(TripPlanModel model) async {
+    if (formKey?.currentState?.validate() != true) return;
+    if (isUploading) return;
+    isUploading = true;
+    Get.back();
+    Utils.toast("Uploading");
+    final List<PlanDays> initialPlans = model.plans ?? [];
+    final List<Future<String>> uploadTasks = [];
+    if (addPlansImages.isNotEmpty) {
+      for (XFile photoFile in addPlansImages) {
+        uploadTasks.add(
+          fireBaseStorageService.upload(
+            path:
+                'trip_plan/${model.id}/plan_day_$days/${photoFile.name} ${DateTime.now()}.jpg',
+            file: photoFile,
+            url: '',
+          ),
+        );
+      }
+    }
+    final List<String> downLoadLink = await Future.wait(uploadTasks);
+    final Plans currentPlan = Plans(
+      id: '${days.value}${Random.secure().nextInt(100000)}${DateTime.now()}',
+      day: days.value,
+      title: addPlanTitleController.text,
+      content: addPlanContentController.text,
+      relatedLink: addPlanAddLinkController.text,
+      likes: [],
+      unlikes: [],
+      photos: downLoadLink,
+      createdAt: DateTime.now(),
+    );
+
+    final PlanDays? abc = initialPlans
+        .where((element) => element.day == days.value.toString())
+        .firstOrNull;
+
+    if (abc != null) {
+      abc.plans.add(currentPlan);
+    } else {
+      initialPlans.add(
+        PlanDays(
+          day: days.value.toString(),
+          plans: [
+            currentPlan,
+          ],
+        ),
+      );
+    }
+
+    await fireStoreService.update(
+      FireStoreModel(
+        collection: Collections.tripPlan,
+        doc: model.id,
+        data: {
+          'plans': initialPlans.map((e) => e.toJson()),
+        },
+      ),
+    );
+    addPlanAddLinkController.clear();
+    addPlanContentController.clear();
+    addPlanTitleController.clear();
+    addPlansImages.clear();
+    Utils.toast("Successfully added");
+    isUploading = false;
+  }
+
+  ///Change trip plan background image
+  Future<void> tripPlanBgImageChange(TripPlanModel model) async {
     if (isUploading) return;
     isUploading = true;
     XFile? pickImage = await imagePicker.pickImage(
@@ -270,8 +286,15 @@ class TripPlanController extends GetxController {
     isUploading = false;
   }
 
-  final RxList<XFile> addPlansImages = <XFile>[].obs;
+  ///Remove picked image before adding to plans
+  void removePickImage(XFile file) {
+    addPlansImages.remove(
+      file,
+    );
+    update(['add_plan_pick_images']);
+  }
 
+  ///Pick image before adding to plans
   Future<void> pickAddPlansImages(
     TripPlanModel model,
   ) async {
@@ -282,7 +305,27 @@ class TripPlanController extends GetxController {
     update(['add_plan_pick_images']);
   }
 
-  Future<void> paid(
+  ///Budget reminder notification
+  Future<void> budgetNotification(TripPlanModel model, UserModel toWho) async {
+    final List<UserModel> forNoti = [toWho];
+    NotificationModel notificationModel = NotificationModel.forAllParticipants(
+      senderName: authService.auth.currentUser!.displayName ?? 'Anonymous',
+      senderId: authService.auth.currentUser!.uid,
+      receivers: forNoti.map((e) => e.uid).toList(),
+      message: ' reminded you to pay budget for ',
+      content: model.tripName,
+    );
+
+    await fireStoreService.write(
+      FireStoreModel(
+          collection: Collections.notification,
+          data: notificationModel.toJson()),
+    );
+    Utils.toast("Notified !");
+  }
+
+  ///Slideable function for budget paid
+  Future<void> paidBudget(
     TripPlanModel tripPlanModel,
     UserModel userModel,
     String paidStatus,
@@ -331,6 +374,8 @@ class TripPlanController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+
+    /// Listen all users for invitation friends
     allUserSubScription = fireStoreService.watchAll(Collections.user).listen(
       (event) {
         _allUser.value = event.docs.map((e) {
@@ -342,8 +387,47 @@ class TripPlanController extends GetxController {
 
   @override
   void onClose() {
+    disposed();
+    super.onClose();
+  }
+}
+
+abstract mixin class TripPlanMixin {
+  late StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
+      allUserSubScription;
+
+  final TextEditingController addPlanTitleController = TextEditingController();
+  final TextEditingController addPlanContentController =
+      TextEditingController();
+  final TextEditingController addPlanAddLinkController =
+      TextEditingController();
+
+  final TextEditingController budgetEntryController = TextEditingController();
+  final FocusNode tripPlanFocusNode = FocusNode();
+  GlobalKey<FormState>? formKey = GlobalKey<FormState>();
+
+  final RxList<UserModel> _allUser = <UserModel>[].obs;
+  List<UserModel> get allUser => _allUser;
+
+  RxList<UserModel> selectedUserList = <UserModel>[].obs;
+
+  final Rx<XFile> pickedImage = XFile('').obs;
+
+  final RxList<XFile> addPlansImages = <XFile>[].obs;
+
+  final RxInt days = 1.obs;
+
+  bool isUploading = false;
+
+  void disposed() {
     allUserSubScription?.cancel();
     allUserSubScription = null;
-    super.onClose();
+    formKey = null;
+    formKey = GlobalKey<FormState>();
+    addPlanTitleController.dispose();
+    addPlanContentController.dispose();
+    addPlanAddLinkController.dispose();
+    budgetEntryController.dispose();
+    tripPlanFocusNode.dispose();
   }
 }

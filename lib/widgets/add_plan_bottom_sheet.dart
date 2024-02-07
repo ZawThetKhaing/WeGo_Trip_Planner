@@ -37,7 +37,13 @@ class AddPlanBottomSheet extends GetView<TripPlanController> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 GestureDetector(
-                  onTap: Get.back,
+                  onTap: () {
+                    Get.back();
+                    controller.addPlanTitleController.clear();
+                    controller.addPlanContentController.clear();
+                    controller.addPlanAddLinkController.clear();
+                    controller.addPlansImages.clear();
+                  },
                   child: const Text(
                     "Cancel",
                     style: AppTheme.welcomeTextStyle,
@@ -163,38 +169,40 @@ class AddPlanBottomSheet extends GetView<TripPlanController> {
                     ),
                   ),
 
-                  TextFormField(
-                    cursorHeight: 16,
-                    cursorColor: AppTheme.textColor1,
-                    controller: controller.addPlanAddLinkController,
-                    style: AppTheme.bottomNavTextStyle.copyWith(
-                      color: AppTheme.likeColor,
-                    ),
-                    maxLines: 4,
-                    decoration: InputDecoration(
-                      fillColor: Colors.white,
-                      focusedBorder: const UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: AppTheme.planInputFillcolor,
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 24.0),
+                    child: TextFormField(
+                      cursorHeight: 16,
+                      cursorColor: AppTheme.textColor1,
+                      controller: controller.addPlanAddLinkController,
+                      style: AppTheme.bottomNavTextStyle.copyWith(
+                        color: AppTheme.likeColor,
+                      ),
+                      decoration: InputDecoration(
+                        fillColor: Colors.white,
+                        focusedBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide(
+                            color: AppTheme.planInputFillcolor,
+                          ),
                         ),
-                      ),
-                      enabledBorder: const UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: AppTheme.planInputFillcolor,
+                        enabledBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide(
+                            color: AppTheme.planInputFillcolor,
+                          ),
                         ),
-                      ),
-                      hintText: "Add link",
-                      hintStyle: AppTheme.bottomNavTextStyle.copyWith(
-                        color: AppTheme.btmNavUnselectedColor,
-                      ),
-                      prefixIconConstraints: const BoxConstraints.expand(
-                        width: 40,
-                        height: 30,
-                      ),
-                      prefixIcon: const PhosphorIcon(
-                        PhosphorIconsBold.link,
-                        size: 18,
-                        color: AppTheme.textColor1,
+                        hintText: "Add link",
+                        hintStyle: AppTheme.bottomNavTextStyle.copyWith(
+                          color: AppTheme.btmNavUnselectedColor,
+                        ),
+                        prefixIconConstraints: const BoxConstraints.expand(
+                          width: 40,
+                          height: 30,
+                        ),
+                        prefixIcon: const PhosphorIcon(
+                          PhosphorIconsBold.link,
+                          size: 18,
+                          color: AppTheme.textColor1,
+                        ),
                       ),
                     ),
                   ),
@@ -243,18 +251,42 @@ class AddPlanBottomSheet extends GetView<TripPlanController> {
                                       right: 10,
                                       bottom: 10,
                                     ),
+                                    padding: const EdgeInsets.only(
+                                      top: 5,
+                                      right: 5,
+                                    ),
                                     width: 110,
                                     height: 100,
-                                    child: ClipRRect(
+                                    decoration: BoxDecoration(
                                       borderRadius: const BorderRadius.all(
                                         Radius.circular(5),
                                       ),
-                                      child: Image.file(
-                                        File(
-                                          controller.addPlansImages[i].path,
+                                      image: DecorationImage(
+                                        image: FileImage(
+                                          File(
+                                            controller.addPlansImages[i].path,
+                                          ),
                                         ),
                                         fit: BoxFit.cover,
                                       ),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            controller.removePickImage(
+                                                controller.addPlansImages[i]);
+                                          },
+                                          child: const Icon(
+                                            Icons.close,
+                                            size: 13,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   )
                                 : GestureDetector(
@@ -263,7 +295,11 @@ class AddPlanBottomSheet extends GetView<TripPlanController> {
                                     },
                                     child: Container(
                                       width: 110,
-                                      height: 100,
+                                      height: 110,
+                                      margin: const EdgeInsets.only(
+                                        right: 10,
+                                        bottom: 10,
+                                      ),
                                       decoration: const BoxDecoration(
                                         color: Color.fromRGBO(243, 243, 243, 1),
                                         borderRadius: BorderRadius.all(

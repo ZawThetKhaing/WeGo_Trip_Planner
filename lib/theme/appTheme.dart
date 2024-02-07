@@ -16,6 +16,9 @@ abstract class AppTheme {
         overlayColor: MaterialStateProperty.all(
           Colors.transparent,
         ),
+        shape: MaterialStateProperty.all(
+          const RoundedRectangleBorder(),
+        ),
         elevation: MaterialStateProperty.all(0),
         textStyle: MaterialStateProperty.all(
           const TextStyle(

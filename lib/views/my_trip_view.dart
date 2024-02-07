@@ -42,8 +42,9 @@ class _MyTripViewState extends State<MyTripView> {
         _myTripPlanList = _myTripPlanList.where(
           (element) {
             if (element.participants == null) return false;
-            return element.owner.uid == appController.loginUser.uid ||
-                (element.participants ?? []).contains(appController.loginUser);
+            return element.owner.uid == appController.loginUser.value.uid ||
+                (element.participants ?? [])
+                    .contains(appController.loginUser.value);
           },
         ).toList();
         _streamController.sink.add(_myTripPlanList);

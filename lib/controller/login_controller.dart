@@ -12,32 +12,7 @@ import 'package:we_go/routes/routes.dart';
 import 'package:we_go/utils/collection.dart';
 import 'package:we_go/utils/utils.dart';
 
-class LoginController extends GetxController {
-  final TextEditingController userNameController = TextEditingController();
-
-  final TextEditingController emailController = TextEditingController();
-  final FocusNode emailFocusNode = FocusNode();
-
-  final TextEditingController passwordController = TextEditingController();
-  final FocusNode passwordFocusNode = FocusNode();
-
-  final TextEditingController phoneController = TextEditingController();
-  final FocusNode phoneFocusNode = FocusNode();
-
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
-  final FocusNode confirmPasswordFocusNode = FocusNode();
-
-  final TextEditingController loginEmailController = TextEditingController();
-
-  final FocusNode loginEmailFocusNode = FocusNode();
-
-  final TextEditingController loginPasswordController = TextEditingController();
-  final FocusNode loginPasswordFocusNode = FocusNode();
-
-  GlobalKey<FormState>? loginKey = GlobalKey<FormState>();
-  GlobalKey<FormState>? signUpKey = GlobalKey<FormState>();
-
+class LoginController extends GetxController with LoginMixin {
   Future<void> signInWithGoogle() async {
     // Trigger the authentication flow
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
@@ -69,8 +44,8 @@ class LoginController extends GetxController {
         email: loginEmailController.text,
         password: loginPasswordController.text,
       );
+      // ignore: unused_catch_clause
     } on FirebaseAuthException catch (e) {
-      print(e);
       Utils.toast('email or password is invalid !');
       return;
     }
@@ -113,7 +88,6 @@ class LoginController extends GetxController {
 
     ///New user
     if (fireData.data() == null) {
-      print("AuthState new user");
       loginUser = UserModel(
         userName: currentUser.displayName ?? userNameController.text,
         phoneNumber: currentUser.phoneNumber ?? phoneController.text,
@@ -133,7 +107,6 @@ class LoginController extends GetxController {
       ///Existing user
       /// if need to update ToDO ::
       /// add fcm token later
-      print("AuthState existing user");
 
       await fireStoreService.update(
         FireStoreModel(
@@ -155,6 +128,44 @@ class LoginController extends GetxController {
 
   @override
   void dispose() {
+    disposed();
+    super.dispose();
+  }
+
+  @override
+  void onClose() {
+    dispose();
+    super.onClose();
+  }
+}
+
+mixin class LoginMixin {
+  final TextEditingController userNameController = TextEditingController();
+
+  final TextEditingController emailController = TextEditingController();
+  final FocusNode emailFocusNode = FocusNode();
+
+  final TextEditingController passwordController = TextEditingController();
+  final FocusNode passwordFocusNode = FocusNode();
+
+  final TextEditingController phoneController = TextEditingController();
+  final FocusNode phoneFocusNode = FocusNode();
+
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
+  final FocusNode confirmPasswordFocusNode = FocusNode();
+
+  final TextEditingController loginEmailController = TextEditingController();
+
+  final FocusNode loginEmailFocusNode = FocusNode();
+
+  final TextEditingController loginPasswordController = TextEditingController();
+  final FocusNode loginPasswordFocusNode = FocusNode();
+
+  GlobalKey<FormState>? loginKey = GlobalKey<FormState>();
+  GlobalKey<FormState>? signUpKey = GlobalKey<FormState>();
+
+  void disposed() {
     loginKey = null;
     loginKey = GlobalKey();
 
@@ -174,6 +185,5 @@ class LoginController extends GetxController {
     passwordFocusNode.dispose();
     confirmPasswordController.dispose();
     confirmPasswordFocusNode.dispose();
-    super.dispose();
   }
 }

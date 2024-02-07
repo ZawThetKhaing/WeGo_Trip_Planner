@@ -22,7 +22,6 @@ class _WrapperScreenState extends State<WrapperScreen> {
     await Future.delayed(
       const Duration(seconds: 1),
       () {
-        print(_appController.authState);
         if (_appController.authState == AuthState.none) {
           Get.offNamed(AppRoutes.login);
           return;

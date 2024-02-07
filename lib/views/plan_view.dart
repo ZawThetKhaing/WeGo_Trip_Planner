@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:we_go/controller/app_controller.dart';
+import 'package:we_go/model/user_model.dart';
 import 'package:we_go/theme/appTheme.dart';
 import 'package:we_go/widgets/button.dart';
 import 'package:we_go/widgets/dateTimePicker.dart';
 import 'package:we_go/widgets/trip_plan_textInputField.dart';
 
 class PlanView extends StatelessWidget {
+  final UserModel userModel;
   const PlanView({
     super.key,
+    required this.userModel,
   });
 
   @override
@@ -24,11 +27,9 @@ class PlanView extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Obx(
-                () => Text(
-                  "Welcome to WeGo, ${controller.loginUser.userName}",
-                  style: AppTheme.welcomeTextStyle,
-                ),
+              Text(
+                "Welcome to WeGo, ${userModel.userName}",
+                style: AppTheme.welcomeTextStyle,
               ),
               const Text(
                 "Create your dream trip now",

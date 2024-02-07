@@ -46,7 +46,7 @@ class StackAppBar extends GetView<TripPlanController> {
             right: 10,
             child: GestureDetector(
               onTap: () {
-                controller.pickImage(model);
+                controller.tripPlanBgImageChange(model);
               },
               child: Container(
                 width: 60,

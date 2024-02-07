@@ -52,7 +52,7 @@ class _InviteFriendScreenState extends State<InviteFriendScreen> {
           fontWeight: FontWeight.w600,
         ),
         title: const Text("Choose people"),
-        leadingWidth: 70,
+        leadingWidth: 80,
         centerTitle: true,
         leading: TextButton(
           onPressed: Get.back,

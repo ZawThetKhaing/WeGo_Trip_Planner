@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:we_go/global.dart';
 import 'package:we_go/utils/collection.dart';
 
 class UserModel {
@@ -10,6 +12,7 @@ class UserModel {
   final String? budgetPaidStatus;
   final int? budgetPaid;
   final DateTime? createdAt;
+  final String? addBy;
   UserModel({
     this.uid,
     this.userName,
@@ -19,17 +22,8 @@ class UserModel {
     this.budgetPaid,
     this.budgetPaidStatus = Collections.unPaid,
     this.createdAt,
+    this.addBy,
   });
-
-  UserModel.toInvite({
-    this.uid,
-    this.userName,
-    this.profilePhoto,
-    this.phoneNumber,
-    this.email,
-    this.budgetPaid,
-    this.budgetPaidStatus = Collections.unPaid,
-  }) : createdAt = DateTime.now();
 
   factory UserModel.fromJson(dynamic data, String id) => UserModel(
         uid: id,
@@ -39,6 +33,7 @@ class UserModel {
         email: data["email"],
         budgetPaidStatus: data["budget_paid_status"],
         createdAt: (data["created_at"] as Timestamp?)?.toDate(),
+        addBy: data["add_by"],
       );
 
   factory UserModel.fromInvite(
@@ -52,6 +47,7 @@ class UserModel {
         email: data["email"],
         budgetPaidStatus: data["budget_paid_status"],
         budgetPaid: int.parse((data["budget_paid"] ?? 0).toString()),
+        addBy: data["add_by"],
         createdAt: (data["created_at"] as Timestamp?)?.toDate(),
       );
 
@@ -64,6 +60,18 @@ class UserModel {
         budgetPaid: data?.budgetPaid ?? budgetPaid,
         budgetPaidStatus: data?.budgetPaidStatus ?? budgetPaidStatus,
         createdAt: data?.createdAt ?? createdAt,
+        addBy: data?.addBy,
+      );
+
+  factory UserModel.fromUser(
+    User data,
+  ) =>
+      UserModel(
+        uid: data.uid,
+        userName: data.displayName,
+        profilePhoto: data.photoURL,
+        phoneNumber: data.phoneNumber,
+        email: data.email,
       );
 
   factory UserModel.forBudgetPaid(
@@ -78,6 +86,7 @@ class UserModel {
         budgetPaidStatus: data.budgetPaidStatus,
         budgetPaid: data.budgetPaid,
         createdAt: data.createdAt,
+        addBy: data.addBy,
       );
 
   Map<String, dynamic> toJson() => {
@@ -89,6 +98,7 @@ class UserModel {
         'budget_paid_status': budgetPaidStatus,
         'budget_paid': budgetPaid,
         'created_at': createdAt,
+        "add_by": addBy,
       };
 
   Map<String, dynamic> toInvite() => {
@@ -99,6 +109,7 @@ class UserModel {
         'email': email,
         'budget_paid_status': budgetPaidStatus,
         'budget_paid': budgetPaid,
+        "add_by": authService.auth.currentUser?.displayName,
         'created_at': createdAt ?? DateTime.now(),
       };
 

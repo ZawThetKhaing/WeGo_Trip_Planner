@@ -57,7 +57,7 @@ class _NotificationViewState extends State<NotificationView> {
             child: CircularProgressIndicator(),
           );
         }
-        if (snap.data == null && snap.data?.isEmpty == true) {
+        if (snap.data == null || snap.data!.isEmpty) {
           return const Center(
             child: Text('No notification'),
           );
@@ -65,12 +65,15 @@ class _NotificationViewState extends State<NotificationView> {
         final List<NotificationModel> allNoti = snap.data!;
         final List<NotificationModel> newNoti = allNoti
             .where(
-              (e) => e.createdAt.day == DateTime.now().day,
+              (e) =>
+                  e.createdAt.day == DateTime.now().day &&
+                  e.createdAt.month == DateTime.now().month &&
+                  e.createdAt.year == DateTime.now().year,
             )
             .toList();
         final List<NotificationModel> previousNoti = allNoti
             .where(
-              (e) => e.createdAt.day < DateTime.now().day,
+              (e) => DateTime.now().compareTo(e.createdAt) == 1,
             )
             .toList();
 
@@ -92,202 +95,225 @@ class _NotificationViewState extends State<NotificationView> {
                 const SizedBox(
                   height: 20,
                 ),
-                Expanded(
-                  child: ListView(
-                    children: [
-                      newNoti.isNotEmpty
-                          ? Text(
-                              "New",
-                              style: AppTheme.normalTextStyle.copyWith(
-                                fontWeight: FontWeight.w500,
-                              ),
-                            )
-                          : const SizedBox(),
-                      SizedBox(
-                        height: newNoti.length * 88,
-                        child: Column(
-                          children: List.generate(
-                            newNoti.length,
-                            (i) {
-                              newNoti.sort(
-                                (a, b) => b.createdAt.compareTo(a.createdAt),
-                              );
-                              return Container(
-                                margin: const EdgeInsets.only(top: 20),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: 37,
-                                      height: 37,
-                                      decoration: const BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: AppTheme.brandColor,
-                                      ),
-                                      child: const Icon(
-                                        Icons.notifications,
-                                        color: Colors.white,
-                                        size: 19,
-                                      ),
+                allNoti.isEmpty
+                    ? const Center(
+                        child: Text('No notification'),
+                      )
+                    : Expanded(
+                        child: ListView(
+                          children: [
+                            newNoti.isNotEmpty
+                                ? Text(
+                                    "New",
+                                    style: AppTheme.normalTextStyle.copyWith(
+                                      fontWeight: FontWeight.w500,
                                     ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(
-                                          width: 300,
-                                          child: RichText(
-                                            text: TextSpan(
-                                              text: newNoti[i].senderName,
-                                              style: AppTheme.normalTextStyle
-                                                  .copyWith(
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                              children: [
-                                                TextSpan(
-                                                  text: newNoti[i].message,
-                                                  style:
-                                                      AppTheme.normalTextStyle,
-                                                ),
-                                                TextSpan(
-                                                  text: newNoti[i].content,
-                                                  style: AppTheme
-                                                      .normalTextStyle
-                                                      .copyWith(
-                                                    fontWeight: FontWeight.w600,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                ),
-                                                TextSpan(
-                                                  text: '.',
-                                                  style: AppTheme
-                                                      .normalTextStyle
-                                                      .copyWith(
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                ),
-                                              ],
+                                  )
+                                : const SizedBox(),
+                            SizedBox(
+                              height: newNoti.length * 88,
+                              child: Column(
+                                children: List.generate(
+                                  newNoti.length,
+                                  (i) {
+                                    newNoti.sort(
+                                      (a, b) =>
+                                          b.createdAt.compareTo(a.createdAt),
+                                    );
+                                    return Container(
+                                      margin: const EdgeInsets.only(top: 20),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            width: 37,
+                                            height: 37,
+                                            decoration: const BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: AppTheme.brandColor,
+                                            ),
+                                            child: const Icon(
+                                              Icons.notifications,
+                                              color: Colors.white,
+                                              size: 19,
                                             ),
                                           ),
-                                        ),
-                                        const SizedBox(
-                                          height: 5,
-                                        ),
-                                        Text(
-                                          style: AppTheme.agoTextStyle,
-                                          "${Utils.ago(newNoti[i].createdAt)} ago",
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      previousNoti.isNotEmpty
-                          ? Text(
-                              "Previous",
-                              style: AppTheme.normalTextStyle.copyWith(
-                                fontWeight: FontWeight.w500,
-                              ),
-                            )
-                          : const SizedBox(),
-                      SizedBox(
-                        height: previousNoti.length * 88,
-                        child: Column(
-                          children: List.generate(
-                            previousNoti.length > 20 ? 20 : previousNoti.length,
-                            (i) {
-                              previousNoti.sort(
-                                (a, b) => b.createdAt.compareTo(a.createdAt),
-                              );
-                              return Container(
-                                margin: const EdgeInsets.only(top: 20),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: 37,
-                                      height: 37,
-                                      decoration: const BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: AppTheme.brandColor),
-                                      child: const Icon(
-                                        Icons.notifications,
-                                        color: Colors.white,
-                                        size: 19,
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        SizedBox(
-                                          width: 300,
-                                          child: RichText(
-                                            text: TextSpan(
-                                              text: previousNoti[i].senderName,
-                                              style: AppTheme.normalTextStyle
-                                                  .copyWith(
-                                                fontWeight: FontWeight.w600,
+                                          const SizedBox(
+                                            width: 10,
+                                          ),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              SizedBox(
+                                                width: 300,
+                                                child: RichText(
+                                                  text: TextSpan(
+                                                    text: newNoti[i].senderName,
+                                                    style: AppTheme
+                                                        .normalTextStyle
+                                                        .copyWith(
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                    children: [
+                                                      TextSpan(
+                                                        text:
+                                                            newNoti[i].message,
+                                                        style: AppTheme
+                                                            .normalTextStyle,
+                                                      ),
+                                                      TextSpan(
+                                                        text:
+                                                            newNoti[i].content,
+                                                        style: AppTheme
+                                                            .normalTextStyle
+                                                            .copyWith(
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                      ),
+                                                      TextSpan(
+                                                        text: '.',
+                                                        style: AppTheme
+                                                            .normalTextStyle
+                                                            .copyWith(
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
                                               ),
-                                              children: [
-                                                TextSpan(
-                                                  text: previousNoti[i].message,
-                                                  style:
-                                                      AppTheme.normalTextStyle,
-                                                ),
-                                                TextSpan(
-                                                  text: previousNoti[i].content,
-                                                  style: AppTheme
-                                                      .normalTextStyle
-                                                      .copyWith(
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                ),
-                                                TextSpan(
-                                                  text: '.',
-                                                  style: AppTheme
-                                                      .normalTextStyle
-                                                      .copyWith(
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                ),
-                                              ],
+                                              const SizedBox(
+                                                height: 5,
+                                              ),
+                                              Text(
+                                                style: AppTheme.agoTextStyle,
+                                                "${Utils.ago(newNoti[i].createdAt)} ago",
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            previousNoti.isNotEmpty
+                                ? Text(
+                                    "Previous",
+                                    style: AppTheme.normalTextStyle.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  )
+                                : const SizedBox(),
+                            SizedBox(
+                              height: previousNoti.length * 88,
+                              child: Column(
+                                children: List.generate(
+                                  previousNoti.length > 20
+                                      ? 20
+                                      : previousNoti.length,
+                                  (i) {
+                                    previousNoti.sort(
+                                      (a, b) =>
+                                          b.createdAt.compareTo(a.createdAt),
+                                    );
+                                    return Container(
+                                      margin: const EdgeInsets.only(top: 20),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            width: 37,
+                                            height: 37,
+                                            decoration: const BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: AppTheme.brandColor),
+                                            child: const Icon(
+                                              Icons.notifications,
+                                              color: Colors.white,
+                                              size: 19,
                                             ),
                                           ),
-                                        ),
-                                        const SizedBox(
-                                          height: 5,
-                                        ),
-                                        Text(
-                                          "${Utils.ago(previousNoti[i].createdAt)} ago",
-                                          style: AppTheme.agoTextStyle,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                                          const SizedBox(
+                                            width: 10,
+                                          ),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              SizedBox(
+                                                width: 300,
+                                                child: RichText(
+                                                  text: TextSpan(
+                                                    text: previousNoti[i]
+                                                        .senderName,
+                                                    style: AppTheme
+                                                        .normalTextStyle
+                                                        .copyWith(
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                    children: [
+                                                      TextSpan(
+                                                        text: previousNoti[i]
+                                                            .message,
+                                                        style: AppTheme
+                                                            .normalTextStyle,
+                                                      ),
+                                                      TextSpan(
+                                                        text: previousNoti[i]
+                                                            .content,
+                                                        style: AppTheme
+                                                            .normalTextStyle
+                                                            .copyWith(
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                      ),
+                                                      TextSpan(
+                                                        text: '.',
+                                                        style: AppTheme
+                                                            .normalTextStyle
+                                                            .copyWith(
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                height: 5,
+                                              ),
+                                              Text(
+                                                "${Utils.ago(previousNoti[i].createdAt)} ago",
+                                                style: AppTheme.agoTextStyle,
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
                                 ),
-                              );
-                            },
-                          ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                )
+                      )
               ],
             ),
           ),

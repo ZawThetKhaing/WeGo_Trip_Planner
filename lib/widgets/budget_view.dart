@@ -8,15 +8,16 @@ import 'package:we_go/model/user_model.dart';
 import 'package:we_go/theme/appTheme.dart';
 import 'package:we_go/utils/collection.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:we_go/widgets/button.dart';
 
 class BudgetPaidList extends GetView<TripPlanController> {
   final UserModel userModel;
   final TripPlanModel tripPlanModel;
+  final bool isTripCreater;
   const BudgetPaidList({
     super.key,
     required this.userModel,
     required this.tripPlanModel,
+    this.isTripCreater = false,
   });
 
   @override
@@ -24,6 +25,7 @@ class BudgetPaidList extends GetView<TripPlanController> {
     return Slidable(
       // Specify a key if the Slidable is dismissible.
       key: const ValueKey(0),
+      enabled: isTripCreater,
 
       endActionPane: ActionPane(
         extentRatio: 0.75,
@@ -31,7 +33,7 @@ class BudgetPaidList extends GetView<TripPlanController> {
         children: [
           SlidableAction(
             onPressed: (context) {
-              controller.paid(
+              controller.paidBudget(
                 tripPlanModel,
                 userModel,
                 Collections.paid,
@@ -71,7 +73,7 @@ class BudgetPaidList extends GetView<TripPlanController> {
                       ),
                     ),
                     onPressed: () {
-                      controller.paid(
+                      controller.paidBudget(
                         tripPlanModel,
                         userModel,
                         Collections.halfPaid,
@@ -96,7 +98,7 @@ class BudgetPaidList extends GetView<TripPlanController> {
           ),
           SlidableAction(
             onPressed: (context) {
-              controller.paid(
+              controller.paidBudget(
                 tripPlanModel,
                 userModel,
                 Collections.unPaid,
@@ -157,7 +159,9 @@ class BudgetPaidList extends GetView<TripPlanController> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Text(
-                          userModel.userName!,
+                          userModel.userName!.length > 15
+                              ? "${userModel.userName!.substring(0, 15)}..."
+                              : userModel.userName!,
                           style: AppTheme.welcomeTextStyle.copyWith(
                             fontSize: 13,
                           ),
@@ -194,20 +198,23 @@ class BudgetPaidList extends GetView<TripPlanController> {
                       width: 30,
                       height: 30,
                       decoration: BoxDecoration(
-                        color:
-                            1 == 2 ? AppTheme.boxColor2 : AppTheme.brandColor,
+                        color: userModel.budgetPaidStatus == Collections.paid
+                            ? AppTheme.boxColor2
+                            : AppTheme.brandColor,
                         borderRadius: BorderRadius.circular(5),
                       ),
                       alignment: Alignment.center,
                       child: IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          controller.budgetNotification(
+                              tripPlanModel, userModel);
+                        },
                         splashRadius: 20,
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.notifications_active_sharp,
-                          color:
-
-                              ///ToDo ::
-                              1 == 2 ? AppTheme.textColor1 : Colors.white,
+                          color: userModel.budgetPaidStatus == Collections.paid
+                              ? AppTheme.textColor1
+                              : Colors.white,
                           size: 15,
                         ),
                       ),

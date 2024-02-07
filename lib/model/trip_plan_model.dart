@@ -11,7 +11,7 @@ class TripPlanModel {
   final String paymentDueDate;
   final int budget;
   final String? backGroundPhoto;
-  final List<Plans>? plans;
+  final List<PlanDays>? plans;
   final DateTime createdAt;
   final List<UserModel>? participants;
 
@@ -40,7 +40,9 @@ class TripPlanModel {
         'participants': participants?.map(
           (e) => e.toInvite(),
         ),
-        'plans': plans?.map((e) => e.toJson()),
+        'plans': plans?.map(
+          (e) => e.toJson(),
+        ),
         'created_at': createdAt,
         'background_photo': backGroundPhoto,
       };
@@ -65,8 +67,9 @@ class TripPlanModel {
             ),
           )
           .toList(),
-      plans:
-          (data['plans'] as List? ?? []).map((e) => Plans.fromJson(e)).toList(),
+      plans: (data['plans'] as List? ?? [])
+          .map((e) => PlanDays.fromJson(e))
+          .toList(),
       backGroundPhoto: data['background_photo'],
     );
   }
@@ -95,11 +98,42 @@ class TripPlanModel {
   int get hashCode => id.hashCode;
 }
 
+class PlanDays {
+  final String day;
+  final List<Plans> plans;
+
+  PlanDays({
+    required this.day,
+    required this.plans,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'day': day,
+        'plans': plans.map(
+          (e) => e.toJson(),
+        ),
+      };
+
+  factory PlanDays.fromJson(dynamic data) => PlanDays(
+        day: data['day'].toString(),
+        plans: (data['plans'] as List? ?? [])
+            .map((e) => Plans.fromJson(e))
+            .toList(),
+      );
+
+  @override
+  operator ==(covariant PlanDays other) => other.day == day;
+
+  @override
+  int get hashCode => day.hashCode;
+}
+
 class Plans {
   final String? id;
   final int day;
   final String title;
   final String content;
+  final String? relatedLink;
   final List<String> likes;
   final List<String> unlikes;
   final List<String>? photos;
@@ -108,6 +142,7 @@ class Plans {
     this.id,
     required this.day,
     required this.title,
+    this.relatedLink,
     required this.content,
     required this.likes,
     this.photos,
@@ -120,6 +155,7 @@ class Plans {
         day: int.parse(data['day'].toString()),
         title: data['title'],
         content: data['content'],
+        relatedLink: data['related_link'],
         likes: (data['likes'] as List).map((e) => e.toString()).toList(),
         unlikes: (data['unlikes'] as List).map((e) => e.toString()).toList(),
         createdAt: (data['created_at'] as Timestamp).toDate(),
@@ -135,6 +171,7 @@ class Plans {
         'day': day,
         'title': title,
         'content': content,
+        'related_link': relatedLink,
         'likes': likes,
         'unlikes': unlikes,
         'created_at': createdAt,

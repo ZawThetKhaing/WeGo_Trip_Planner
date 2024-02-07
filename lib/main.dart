@@ -32,6 +32,7 @@ class MyApp extends StatelessWidget {
       getPages: AppRoutes.getPages,
       initialRoute: AppRoutes.wrapper,
       // showPerformanceOverlay: true,
+      debugShowCheckedModeBanner: false,
       theme: AppTheme.appTheme,
     );
   }
